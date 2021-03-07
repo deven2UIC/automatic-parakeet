@@ -36,6 +36,7 @@ After3:
 sw $s1, 0x60($t2)	# Store bit counter in array w/ offset 0x60
 addi $s1, $zero, 0	# Reset bit counter
 addi $s0, $zero, 0x1	# Reset bitmask
+j While
 addi $t2, $t2, 4 	# Increment array pointer3
 addi $t5, $t5, 1 	# Increment i
 
