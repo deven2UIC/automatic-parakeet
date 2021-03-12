@@ -4,9 +4,9 @@
 # Best match bit number: at M[0x2004]
 # Address of the best match element: at M[0x2008]
 
-addi $8, $0, -23456		# A[0] = $8 = 3
-lui $9, 0x1F2E			# $9 = 0x12340000
-ori $9, $9, 0x3D4C 		# T = $9 = 0x1234fedc
+addi $8, $0, -6			# A[0] = $8 = 3
+lui $9, 0x1234			# $9 = 0x12340000
+ori $9, $9, 0xfedc 		# T = $9 = 0x1234fedc
 
 addi $t2, $zero, 0x2020	# Set $t2 to 0x2020 as &A[0]
 addi $t3, $zero, 0x2070	# Set $t3 to 0x2070 as last element of A[]
