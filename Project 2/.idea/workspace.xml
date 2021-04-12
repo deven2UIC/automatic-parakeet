@@ -2,34 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="04179a08-56d5-42bd-a37e-f8599d3d617a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ALU_hex.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CompOrg.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/4 Samples/ALU.asm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/4 Samples/ALU_hex.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/4 Samples/branch.asm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/4 Samples/branch_hex.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/4 Samples/memaccess.asm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/4 Samples/memaccess_hex.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/4 Samples/special.asm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/4 Samples/special_hex.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/dump.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/mips1.asm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/proj2mod.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/proj2redo.asm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mars Example/proj2special.asm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assemblyCode.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assemblyCodeSpecial.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assemblyCodeStandard.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/branch_hex.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/memaccess_hex.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/p1-default-mc.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/p1-special-mc.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/project1.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/project1special.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/special_hex.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Project 1/project1.asm" beforeDir="false" afterPath="$PROJECT_DIR$/../Project 1/project1.asm" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Project 3/PythonSimulator/Instruction.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Project 3/PythonSimulator/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Project 3/PythonSimulator/venv/ISA.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mars Example/proj2redo.asm" beforeDir="false" afterPath="$PROJECT_DIR$/Mars Example/proj2redo.asm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/p1-special-mc.txt" beforeDir="false" afterPath="$PROJECT_DIR$/p1-special-mc.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +45,9 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../studious-broccoli" />
     <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager" selected="Python.main">
     <configuration name="CompOrg" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">

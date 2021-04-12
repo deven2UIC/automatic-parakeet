@@ -246,6 +246,7 @@ def print_menu():
     print('\tGo to PC =     (PC=*)\tMust be multiple of 4, can\'t jump to previous loop iterations')
     print('\tEntry: ', end='')
 
+
 def print_file_menu():
     print('Which file would you like to run?')
     print('\t1) Project 1')
