@@ -55,6 +55,7 @@ class ISA:
 
     def __init__(self, in_filename, out_filename):
         # Set initial values for MIPS engine
+        print("Loading...")
         self._offset = 0
         self._program = {}
         self._PC = 0
@@ -84,6 +85,7 @@ class ISA:
         self._PC = 0
         #self.print_state()
         self._save_cur_state()
+        print('...Program loaded successfully')
 
     def run(self):
         """Runs until _PC executes last instruction."""
@@ -181,31 +183,6 @@ class ISA:
         else:
             print('Error: program has not yet reached this point.\n')
 
-    def print_mem(self):
-        """Prints memory content."""
-        print('Memory:')
-        mem_index = 0
-        for i in range(0, len(self._mem), 0x20):
-            for j in range(0, 0x20, 4):
-                print('{}: {:5d}'.format(hex(i + j + 0x2000), self._mem[mem_index]), end='\t')
-                mem_index = mem_index + 1
-            print()
-
-    def print_regs(self):
-        """Prints register content."""
-        print('Registers:')
-        for i in range(0, 8):
-            print('${} = {}'.format(i, self._regs[i]), end='\t')
-        print()
-
-        for i in range(8, 12):
-            print('${} = {}'.format(i, self._regs[i]), end='\t')
-        print()
-
-        for i in range(8, 20):
-            print('${} = {}'.format(i, self._regs[i]), end='\t')
-        print()
-
     def set_reg(self, reg, val):
         """Set register reg with 'val'"""
         self._regs[reg] = val
@@ -216,11 +193,14 @@ class ISA:
 
     def set_mem(self, add, val):
         """Set value of memory address 'add' with value 'val'"""
-        pass
+        self._mem[add] = val
 
     def get_mem(self, add):
         """Get value of memory address 'add'"""
-        pass
+        return self._mem[add]
+
+    def set_offset(self, off):
+        self._offset = off
 
     def print_stats(self):
         """Prints stats for instruction count/usage."""
@@ -230,6 +210,43 @@ class ISA:
         print('Branch: {}'.format(self._branch))
         print('Memory: {}'.format(self._memory))
         print('Other : {}'.format(self._other))
+
+    def print_mem(self):
+        """Prints memory content."""
+        print('Memory:')
+        mem_index = 0
+        for i in range(0, len(self._mem)):
+            print('0x{}: {:5d}|'.format(hex(i * 0x4)[2:].zfill(3), self._mem[i]), end='')
+            if i % 8 == 7:
+                print()
+
+    def print_mem_nonzero(self):
+        """Prints memory content."""
+        print('Memory:')
+        mem_printed = 0
+        for i in range(0, len(self._mem)):
+            if self._mem[i] != 0:
+                print('0x{}: {:5d}|'.format(hex(i * 0x4)[2:].zfill(3), self._mem[i]), end='')
+                mem_printed = mem_printed + 1
+            if mem_printed % 8 == 7 or i == len(self._mem) - 1:
+                print()
+        if mem_printed == 0:
+            print('No non-zero memory')
+
+    def print_regs(self):
+        """Prints register content."""
+        print('Registers:')
+        for i in range(0, 8):
+            print('${} = {}'.format(i, self._regs[i]), end='\t')
+        print()
+
+        for i in range(8, 16):
+            print('${} = {}'.format(i, self._regs[i]), end='\t')
+        print()
+
+        for i in range(16, 20):
+            print('${} = {}'.format(i, self._regs[i]), end='\t')
+        print()
 
     def print_state(self):
         print('********************** Program State at PC = {} **********************'.format(self._PC))
@@ -241,6 +258,6 @@ class ISA:
 
         print('PC: {}\tJust executed: {}\tLoaded instruction: {}'.format(self._PC, prev_inst, cur_inst.get_inst()))
         self.print_regs()
-        self.print_mem()
-        self.print_stats()
+        self.print_mem_nonzero()
+        #self.print_stats()
         print('********************** Program State END ******************************\n'.format(self._PC))

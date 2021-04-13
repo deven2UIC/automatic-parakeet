@@ -1,6 +1,7 @@
 
+
 class Instruction:
-    '''Instantiate with a hex string'''
+    """Instantiate with a hex string"""
 
     # Add i type instructions here {op : name}
     i_types = {'0000': 'init',
@@ -205,6 +206,124 @@ def twos_comp(x):   # string x of 0/1
     return y
 
 
+def special_imm(inst):
+    """Finds special immediate values for operation from dict"""
+    if inst.get_action() in imm_vals:
+        return imm_vals[inst.get_action()][inst.get_imm()]
+    else:
+        return inst.get_imm()
+
+def special_reg(inst):
+    if inst.get_action() in reg_vals:
+        return reg_vals[inst.get_action()][inst.get_rx()]
+    else:
+        return inst.get_rx()
+
+def special_reg_y(inst):
+    if inst.get_action() in reg_vals:
+        return reg_vals[inst.get_action()][inst.get_ry()]
+    else:
+        return inst.get_ry()
+
+
+"""
+Functions for each supported instructions. Each are indexed in a dictionary in the main 
+program file where they can be called automatically.
+"""
+def init(core, inst):
+    """Rx =- imm [-8,7]"""
+    core.set_reg(inst.get_rx(), twos_comp(inst.get_imm()))
+
+def addi1(core, inst):
+    """Rx = Rx + imm{-1, 1, 4, 20, 32}"""
+    s_reg = special_reg(inst)
+    operand1 = core.get_reg(s_reg)
+    operand2 = special_imm(inst)
+    core.set_reg(special_reg(inst), operand1 + operand2)
+
+def addi2(core, inst):
+    s_reg = special_reg(inst)
+    operand1 = core.get_reg(s_reg)
+    operand2 = special_imm(inst)
+    core.set_reg(special_reg(inst), operand1 + operand2)
+
+def sw(core, inst):
+    address = special_reg_y(inst)
+    value = special_reg(inst)
+    core.set_mem(address, value)
+
+def beqR0(core, inst):
+    offset = twos_comp(inst.get_imm())
+    r0 = core.get_reg(0)
+    if r0 == 0:
+        core.set_offset(offset)
+
+def bneRO(core, inst):
+    offset = twos_comp(inst.get_imm())
+    r0 = core.get_reg(0)
+    if r0 != 0:
+        core.set_offset(offset)
+
+def sltR01(core, inst):
+    Rx_val = core.get_reg(special_reg(inst))
+    Ry_val = core.get_reg(special_reg_y(inst))
+    if Rx_val < Ry_val:
+        core.set_reg(0, 1)
+    else:
+        core.set_reg(0, 0)
+
+def sltR02(core, inst):
+    Rx_val = core.get_reg(special_reg(inst))
+    Ry_val = core.get_reg(special_reg_y(inst))
+    if Rx_val < Ry_val:
+        core.set_reg(0, 1)
+    else:
+        core.set_reg(0, 0)
+
+def sll(core, inst):
+    Rx = special_reg(inst)
+    Rx_val = core.get_reg(Rx)
+    imm = twos_comp(inst.get_imm())
+    Rx_val = Rx_val << (imm + 1)
+    core.set_reg(Rx, Rx_val)
+
+def xor(core, inst):
+    Rx = special_reg(inst)
+    Ry = special_reg_y(inst)
+    Rx_val = core.get_reg(Rx)
+    Ry_val = core.get_reg(Ry)
+
+    # !!! vHIGHLY SUSPICIOUSv !!!
+    result = Rx_val ^ Ry_val
+    # !!! ^HIGHLY SUSPICIOUS^ !!!
+
+    core.set_reg(Rx, result)
+
+def sub(core, inst):
+    Rx = special_reg(inst)
+    Ry = special_reg_y(inst)
+    Rx_val = core.get_reg(Rx)
+    Ry_val = core.get_reg(Ry)
+
+    result = Rx_val - Ry_val
+
+    core.set_reg(Rx, result)
+
+def add(core, inst):
+    Rx = special_reg(inst)
+    Ry = special_reg_y(inst)
+    Rx_val = core.get_reg(Rx)
+    Ry_val = core.get_reg(Ry)
+
+    result = Rx_val + Ry_val
+
+    core.set_reg(Rx, result)
+
+
+def halt(core, inst):
+    core.set_offset(-1)
+
+
 imm_vals = {
     'addi1': {
         0: -23456,
@@ -273,83 +392,6 @@ reg_vals = {
         3: 18
     }
 }
-
-def special_imm(inst):
-    """Finds special immediate values for operation from dict"""
-    if inst.get_action() in imm_vals:
-        return imm_vals[inst.get_action()][inst.get_imm()]
-    else:
-        return inst.get_imm()
-
-def special_reg(inst):
-    if inst.get_action() in reg_vals:
-        return reg_vals[inst.get_action()][inst.get_rx()]
-    else:
-        return inst.get_rx()
-
-def special_reg_y(inst):
-    if inst.get_action() in reg_vals:
-        return reg_vals[inst.get_action()][inst.get_ry()]
-    else:
-        return inst.get_ry()
-
-"""
-Functions for each supported instructions. Each are indexed in a dictionary in the main 
-program file where they can be called automatically.
-"""
-def init(core, inst):
-    """Rx =- imm [-8,7]"""
-    core.set_reg(inst.get_rx(), twos_comp(inst.get_imm()))
-
-def addi1(core, inst):
-    """Rx = Rx + imm{-1, 1, 4, 20, 32}"""
-    s_reg = special_reg(inst)
-    operand1 = core.get_reg(s_reg)
-    operand2 = special_imm(inst)
-    core.set_reg(special_reg(inst), operand1 + operand2)
-
-def addi2(core, inst):
-    pass
-
-def sw(core, inst):
-    pass
-
-def beqR0(core, inst):
-    pass
-
-
-def bneRO(core, inst):
-    pass
-
-
-def sltR01(core, inst):
-    pass
-
-
-def sltR02(core, inst):
-    pass
-
-
-def sll(core, inst):
-    pass
-
-
-def xor(core, inst):
-    pass
-
-
-def sub(core, inst):
-    pass
-
-
-def add(core, inst):
-    pass
-
-
-def halt(core, inst):
-    pass
-
-
 # def beq(core, inst):
 #     core._branch = core._branch + 1
 #
