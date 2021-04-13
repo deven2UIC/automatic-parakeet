@@ -2,8 +2,8 @@ import Instruction
 
 
 class ISA:
-    _regs = [0] * 32
-    _mem = [0] * 32 * 8
+    _regs = [0] * 20  # 20 registers
+    _mem = [0] * 256  # 256 memory locations
     _mem_history = {}
     _regs_history = {}
 
@@ -15,8 +15,9 @@ class ISA:
     _other = 0
 
     class ProgramState:
-        regs = [0] * 32
-        mem = [0] * 32 * 8
+        """Holds previous program states including register/memory content and stats"""
+        regs = [0] * 20  # 20 registers
+        mem = [0] * 256  # 256 memory locations
 
         total = 0
         ALU = 0
@@ -37,25 +38,19 @@ class ISA:
 
     _state_history = {}
 
-    _actions = {'beq': Instruction.beq,
-                'bne': Instruction.bne,
-                'addi': Instruction.addi,
-                'andi': Instruction.andi,
-                'ori': Instruction.ori,
-                'lw': Instruction.lw,
+    _actions = {'init': Instruction.init,
+                'addi1': Instruction.addi1,
+                'addi2': Instruction.addi2,
                 'sw': Instruction.sw,
-                'lui': Instruction.lui,
+                'beqR0': Instruction.beqR0,
+                'bneRO': Instruction.bneRO,
+                'sltR01': Instruction.sltR01,
+                'sltR02': Instruction.sltR02,
                 'sll': Instruction.sll,
-                'srl': Instruction.srl,
-                'add': Instruction.add,
-                'sub': Instruction.sub,
-                'and': Instruction.and_,
-                'or': Instruction.or_,
-                'slt': Instruction.slt,
-                'j': Instruction.j,
                 'xor': Instruction.xor,
-                'nor': Instruction.nor,
-                'mtc': Instruction.mtc
+                'sub': Instruction.sub,
+                'add': Instruction.add,
+                'halt': Instruction.halt,
                 }
 
     def __init__(self, in_filename, out_filename):
@@ -72,11 +67,11 @@ class ISA:
         # Store all instructions by initializing Instruction objects into _program dictionary
         # indexed by _PC
         self._program_len = len(inst_temp)
-        self._PC_last = (self._program_len * 4) - 4
+        self._PC_last = self._program_len - 1
         print('# instructions: {}\tLast Instruction: {}'.format(len(inst_temp), self._PC_last))
         for i in range(0, len(inst_temp)):
             self._program[self._PC] = Instruction.Instruction(inst_temp[i])
-            self._PC = self._PC + 4
+            self._PC = self._PC + 1
 
         # Output assembly file
         self._output_f = open(out_filename, 'w')
@@ -87,7 +82,7 @@ class ISA:
 
         print()
         self._PC = 0
-        self.print_state()
+        #self.print_state()
         self._save_cur_state()
 
     def run(self):
@@ -107,7 +102,7 @@ class ISA:
         #print('PC: {}\t{}'.format(self._PC, cur_inst.get_inst()))
         self._actions[self._program[self._PC].get_action()](self, self._program[self._PC])  # Execute instruction
         self._regs[0] = 0  # $0 = 0 always
-        self._PC = self._PC + self._offset + 4  # Increment PC
+        self._PC = self._PC + self._offset + 1  # Increment PC
         self._offset = 0  # Return offset to 0 after potential branch
         self._total = self._total + 1
 
@@ -121,6 +116,7 @@ class ISA:
 
     def step(self):
         """Runs the next instruction."""
+        # End condition and program close
         if self._PC > self._PC_last:
             self._PC = self._PC_last
             print("Program terminated successfully, printing end state...PC={}".format(self._PC))
@@ -128,11 +124,12 @@ class ISA:
             #self.print_state()
             return
 
+        # Program run
         cur_inst = self._program[self._PC]  # Set current instruction
         self.print_state()
         self._actions[self._program[self._PC].get_action()](self, self._program[self._PC])  # Execute instruction
         self._regs[0] = 0  # $0 = 0 always
-        self._PC = self._PC + self._offset + 4  # Increment PC
+        self._PC = self._PC + self._offset + 1  # Increment PC
         self._offset = 0  # Return offset to 0 after potential branch
         self._total = self._total + 1
 
@@ -141,7 +138,7 @@ class ISA:
     def step_back(self):
         """Returns to the previous instruction."""
         if self._PC > 0:
-            self._load_state(self._PC - 4)
+            self._load_state(self._PC - 1)
             self.print_state()
         else:
             print('Error: Already at beginning\n')
@@ -201,15 +198,29 @@ class ISA:
             print('${} = {}'.format(i, self._regs[i]), end='\t')
         print()
 
-        for i in range(8, 16):
+        for i in range(8, 12):
             print('${} = {}'.format(i, self._regs[i]), end='\t')
         print()
-        for i in range(16, 24):
+
+        for i in range(8, 20):
             print('${} = {}'.format(i, self._regs[i]), end='\t')
         print()
-        for i in range(24, len(self._regs)):
-            print('${} = {}'.format(i, self._regs[i]), end='\t')
-        print()
+
+    def set_reg(self, reg, val):
+        """Set register reg with 'val'"""
+        self._regs[reg] = val
+
+    def get_reg(self, reg):
+        """Get value of register 'reg'"""
+        return self._regs[reg]
+
+    def set_mem(self, add, val):
+        """Set value of memory address 'add' with value 'val'"""
+        pass
+
+    def get_mem(self, add):
+        """Get value of memory address 'add'"""
+        pass
 
     def print_stats(self):
         """Prints stats for instruction count/usage."""
@@ -223,7 +234,7 @@ class ISA:
     def print_state(self):
         print('********************** Program State at PC = {} **********************'.format(self._PC))
         if self._PC > 0:
-            prev_inst = self._program[self._PC - 4].get_inst()  # Set current instruction
+            prev_inst = self._program[self._PC - 1].get_inst()  # Set current instruction
         else:
             prev_inst = 'No previous'
         cur_inst = self._program[self._PC]  # Set current instruction

@@ -16,7 +16,7 @@ def print_menu():
 
 def print_file_menu():
     print('Which file would you like to run?')
-    print('\t 1) Escape Array')
+    print('\t 1) test')
     print('\t 2) Target Match')
     print('\t 3) Full project 3')
     print('\t 4) N/A')
@@ -31,7 +31,7 @@ program_file = ''
 
 while entry != -1:
     if entry == 1:
-        program_file = 'escape_array.txt'
+        program_file = 'test.txt'
     elif entry == 2:
         program_file = 'target_match.txt'
     elif entry == 3:
@@ -43,13 +43,19 @@ while entry != -1:
     elif entry == 6:
         program_file = 'special_hex.txt'
 
-    engine = ISA.ISA(program_file, 'p1-special-mc.txt')
+    print('Enter output file name (default output.txt):')
+    output_file = input()
+    if output_file == '':
+        output_file = 'output.txt'
+
+    # Launch ISA engine
+    engine = ISA.ISA(program_file, output_file)
 
     print_menu()
     entry = input()
     print()
     while entry != '-1':
-        if (entry == ""):
+        if entry == "":
             engine.step()
         elif entry == '.':
             engine.step_back()
