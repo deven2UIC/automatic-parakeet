@@ -43,7 +43,7 @@ class ISA:
                 'addi2': Instruction.addi2,
                 'sw': Instruction.sw,
                 'beqR0': Instruction.beqR0,
-                'bneRO': Instruction.bneRO,
+                'bneR0': Instruction.bneRO,
                 'sltR01': Instruction.sltR01,
                 'sltR02': Instruction.sltR02,
                 'sll': Instruction.sll,
@@ -59,6 +59,7 @@ class ISA:
         self._offset = 0
         self._program = {}
         self._PC = 0
+        self._error = False
 
         # Read in hex file
         self._f = open(in_filename)
@@ -90,52 +91,80 @@ class ISA:
     def run(self):
         """Runs until _PC executes last instruction."""
         can_run = True
-        while can_run:
-            cur_inst = self._program[self._PC]
-            #print('PC: {}\t{}'.format(self._PC, cur_inst.get_inst()))
-            can_run = self._step()
+        try:
+            while can_run:
+                cur_inst = self._program[self._PC]
+                can_run = self._step()
 
-        print("Program terminated successfully, printing end state...PC={}".format(self._PC))
+        except KeyError:
+            print('No key [{}] found'.format(self._PC))
+
+        if self._error:
+            print("Program terminated with errors, printing end state...PC={}".format(self._PC))
+        else:
+            print("Program terminated successfully, printing end state...PC={}".format(self._PC))
         self.print_state()
 
     def _step(self):
         """Runs the next instruction."""
-        cur_inst = self._program[self._PC]  # Set current instruction
-        #print('PC: {}\t{}'.format(self._PC, cur_inst.get_inst()))
-        self._actions[self._program[self._PC].get_action()](self, self._program[self._PC])  # Execute instruction
-        self._regs[0] = 0  # $0 = 0 always
-        self._PC = self._PC + self._offset + 1  # Increment PC
-        self._offset = 0  # Return offset to 0 after potential branch
-        self._total = self._total + 1
+        try:
+            cur_inst = self._program[self._PC]  # Set current instruction
 
-        self._save_cur_state()
+            self._actions[self._program[self._PC].get_action()](self, self._program[self._PC])  # Execute instruction
 
-        if self._PC > self._PC_last:
-            self._PC = self._PC_last
-            return False
-        else:
-            return True
+            if self._offset == -1:
+                return False
+
+            self._regs[0] = 0  # $0 = 0 always
+            self._PC = self._PC + self._offset + 1  # Increment PC
+            self._offset = 0  # Return offset to 0 after potential branch
+            self._total = self._total + 1
+
+            self._save_cur_state()
+
+            if self._PC > self._PC_last:
+                self._PC = self._PC_last
+                return False
+            else:
+                return True
+        except Exception as exp:
+            print('Error {}\n Program State at Error:'.format(exp))
+            self._error = True
+            self.print_state()
 
     def step(self):
         """Runs the next instruction."""
         # End condition and program close
-        if self._PC > self._PC_last:
-            self._PC = self._PC_last
-            print("Program terminated successfully, printing end state...PC={}".format(self._PC))
+        try:
+            if self._PC > self._PC_last:
+                self._PC = self._PC_last
+                if self._error:
+                    print("Program terminated with errors, printing end state...PC={}".format(self._PC))
+                else:
+                    print("Program terminated successfully, printing end state...PC={}".format(self._PC))
+                self._save_cur_state()
+                #self.print_state()
+                return
+
+            # Program run
+            cur_inst = self._program[self._PC]  # Set current instruction
+            self.print_short_state()
+
+            self._actions[
+                self._program[self._PC].get_action()
+            ](self, self._program[self._PC])  # Execute instruction
+
+            self._regs[0] = 0  # $0 = 0 always
+            self._PC = self._PC + self._offset + 1  # Increment PC
+            self._offset = 0  # Return offset to 0 after potential branch
+            self._total = self._total + 1
+
             self._save_cur_state()
-            #self.print_state()
-            return
 
-        # Program run
-        cur_inst = self._program[self._PC]  # Set current instruction
-        self.print_state()
-        self._actions[self._program[self._PC].get_action()](self, self._program[self._PC])  # Execute instruction
-        self._regs[0] = 0  # $0 = 0 always
-        self._PC = self._PC + self._offset + 1  # Increment PC
-        self._offset = 0  # Return offset to 0 after potential branch
-        self._total = self._total + 1
-
-        self._save_cur_state()
+        except Exception as exp:
+            print('Error {}\n Program State at Error:'.format(exp))
+            self._error = True
+            self.print_state()
 
     def step_back(self):
         """Returns to the previous instruction."""
@@ -205,11 +234,11 @@ class ISA:
     def print_stats(self):
         """Prints stats for instruction count/usage."""
         print('Total : {}'.format(self._total))
-        print('ALU   : {}'.format(self._ALU))
-        print('Jump  : {}'.format(self._jump))
-        print('Branch: {}'.format(self._branch))
-        print('Memory: {}'.format(self._memory))
-        print('Other : {}'.format(self._other))
+        # print('ALU   : {}'.format(self._ALU))
+        # print('Jump  : {}'.format(self._jump))
+        # print('Branch: {}'.format(self._branch))
+        # print('Memory: {}'.format(self._memory))
+        # print('Other : {}'.format(self._other))
 
     def print_mem(self):
         """Prints memory content."""
@@ -259,5 +288,17 @@ class ISA:
         print('PC: {}\tJust executed: {}\tLoaded instruction: {}'.format(self._PC, prev_inst, cur_inst.get_inst()))
         self.print_regs()
         self.print_mem_nonzero()
-        #self.print_stats()
+        self.print_stats()
+        print('********************** Program State END ******************************\n'.format(self._PC))
+
+    def print_short_state(self):
+        print('********************** Abbrev. State at PC = {} **********************'.format(self._PC))
+        if self._PC > 0:
+            prev_inst = self._program[self._PC - 1].get_inst()  # Set current instruction
+        else:
+            prev_inst = 'No previous'
+        cur_inst = self._program[self._PC]  # Set current instruction
+
+        print('PC: {}\tJust executed: {}\tLoaded instruction: {}'.format(self._PC, prev_inst, cur_inst.get_inst()))
+        print('Total Executed: {}'.format(self._total))
         print('********************** Program State END ******************************\n'.format(self._PC))

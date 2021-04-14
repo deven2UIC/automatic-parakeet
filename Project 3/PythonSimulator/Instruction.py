@@ -86,7 +86,7 @@ class Instruction:
         # Get value for rx, if necessary
         if self._inst == 'init':
             self._rx = self._bin[4:6][::-1]
-        elif self._inst[:3] == 'beq':
+        elif self._inst[:3] == 'beq' or self._inst[:3] == 'bne':
             pass
         else:
             self._rx = self._bin[2:4][::-1]
@@ -97,7 +97,12 @@ class Instruction:
         else:
             self._imm = self._bin[:4][::-1]  # Take the last 4
 
-        self._full = '{} ${}, {}'.format(self._inst, int(self._rx, 2), int(self._imm, 2))
+        # Set full instruction string
+        if self._inst[:3] == 'beq' or self._inst[:3] == 'bne':
+            self._full = '{} {}'.format(self._inst, int(self._imm, 2))
+        else:
+            self._full = '{} ${}, {}'.format(self._inst, int(self._rx, 2), int(self._imm, 2))
+
         #print('Name: {}\n'.format(self._full))
 
     def _j_type(self):
@@ -143,10 +148,14 @@ class Instruction:
 
     def print_inst(self):
         """Prints inst with special regs/imm vals in text."""
+        full = 'ERROR'
         if self._type == 'r':
-            full = '{} ${}, ${}'.format(self._inst, int(self._rx, 2), int(self._ry, 2))
+            full = '{} ${}, ${}'.format(self._inst, special_reg(self), special_reg_y(self))
         elif self._type == 'i':
-            full = '{} ${}, {}'.format(self._inst, int(self._rx, 2), int(self._imm, 2))
+            if self._inst[:3] == 'beq' or self._inst[:3] == 'bne':
+                full = '{} {}'.format(self._inst, special_imm(self))
+            else:
+                full = '{} ${}, {}'.format(self._inst, special_reg(self), special_imm(self))
         print(full)
 
     def print_inst_true(self):
@@ -155,10 +164,14 @@ class Instruction:
 
     def get_inst(self):
         """Returns instruction as string."""
+        full = 'ERROR'
         if self._type == 'r':
             full = '{} ${}, ${}'.format(self._inst, special_reg(self), special_reg_y(self))
         elif self._type == 'i':
-            full = '{} ${}, {}'.format(self._inst, special_reg(self), special_imm(self))
+            if self._inst[:3] == 'beq' or self._inst[:3] == 'bne':
+                full = '{} {}'.format(self._inst, special_imm(self))
+            else:
+                full = '{} ${}, {}'.format(self._inst, special_reg(self), special_imm(self))
 
         return full
 
@@ -191,9 +204,12 @@ Helper functions and data for the operation functions
 """
 def twos_comp(x):   # string x of 0/1
     # find rightmost 1's index xxxx1000
+    if x is not str:
+        x = bin(x)[2:]
+
     rightmost1_idx = -1
     for i in range(len(x)-1, -1, -1):
-        print(i)
+        # print(i)
         if x[i] == '1':
             rightmost1_idx = i
             break
@@ -253,7 +269,7 @@ def sw(core, inst):
     core.set_mem(address, value)
 
 def beqR0(core, inst):
-    offset = twos_comp(inst.get_imm())
+    offset = int(twos_comp(inst.get_imm()), 2)
     r0 = core.get_reg(0)
     if r0 == 0:
         core.set_offset(offset)
@@ -283,7 +299,7 @@ def sltR02(core, inst):
 def sll(core, inst):
     Rx = special_reg(inst)
     Rx_val = core.get_reg(Rx)
-    imm = twos_comp(inst.get_imm())
+    imm = int(twos_comp(inst.get_imm()))
     Rx_val = Rx_val << (imm + 1)
     core.set_reg(Rx, Rx_val)
 
@@ -325,11 +341,13 @@ def halt(core, inst):
 
 
 imm_vals = {
+    # Dict of dicts containing all 'special' immediate values
+    # i.e. any value that is not its literal value.
     'addi1': {
         0: -23456,
-        1: 305463004,
+        1: 0xFEDC,
         2: 1,
-        3: 0x2020
+        3: 3
     },
     'addi2': {
         0: 32,
@@ -337,13 +355,13 @@ imm_vals = {
         2: -1,
         3: 20
     },
-    'bne': {
+    'bneR0': {
         0: 2,
         1: -5,
         2: 5,
         3: -29
     },
-    'beq': {
+    'beqR0': {
         0: 4,
         1: 1,
         2: 2,
@@ -352,6 +370,8 @@ imm_vals = {
 }
 
 reg_vals = {
+    # Dict of dicts containing all 'special' register values
+    # i.e. any register access that is not it's literal value.
     'addi1': {
         0: 8,
         1: 9,
@@ -375,13 +395,13 @@ reg_vals = {
         1: 0,
         2: 17
     },
-    'slt1': {
+    'sltR01': {
         0: 0,
         1: 14,
         2: 17,
         3: 18
     },
-    'slt2': {
+    'sltR02': {
         0: 0,
         1: 8,
     },
@@ -390,6 +410,18 @@ reg_vals = {
         1: 11,
         2: 17,
         3: 18
+    },
+    'sll': {
+        0: 0,
+        1: 14,
+        2: 2,
+        3: 3
+    },
+    'xor': {
+        0: 14,
+        1: 8,
+        2: 2,
+        3: 3
     }
 }
 # def beq(core, inst):

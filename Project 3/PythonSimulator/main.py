@@ -10,7 +10,7 @@ def print_menu():
     print('\tShow memory    (mem)')
     print('\tShow registers (regs)')
     print('\tShow stats     (stats)')
-    print('\tGo to PC =     (PC=*)\tMust be multiple of 4, can\'t jump to previous loop iterations')
+    print('\tGo to PC =     (PC=*)')
     print('\tEntry: ', end='')
 
 

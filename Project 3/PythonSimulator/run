@@ -3,14 +3,14 @@ addi1 $9, 65244
 addi1 $10, 1
 addi2 $13, 20
 sw $8, $10
-xor $14, $8
+xor $0, $1
 addi2 $15, 32
 sub $17, $0
 sltR01 $14, $0
 bneR0 2
 addi2 $17, 1
 addi2 $15, -1
-sll $14, 0
+sll $1, 0
 bneR0 -5
 sw $17, $10
 addi1 $19, 3
