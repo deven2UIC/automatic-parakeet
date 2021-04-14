@@ -300,5 +300,6 @@ class ISA:
         cur_inst = self._program[self._PC]  # Set current instruction
 
         print('PC: {}\tJust executed: {}\tLoaded instruction: {}'.format(self._PC, prev_inst, cur_inst.get_inst()))
+        self.print_regs()
         print('Total Executed: {}'.format(self._total))
         print('********************** Program State END ******************************\n'.format(self._PC))

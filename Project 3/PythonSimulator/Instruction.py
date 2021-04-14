@@ -22,7 +22,8 @@ class Instruction:
                '1011': 'xor',
                '1100': 'sub',
                '0110': 'sw',
-               '1101': 'add'
+               '1101': 'add',
+               '11111': 'nxt'  # not in use
                }
 
     # Add j type instructions here {op : name}
@@ -221,6 +222,13 @@ def twos_comp(x):   # string x of 0/1
     y = y_flip+y_same
     return y
 
+def int_to_32bin_string(i):
+    if i>=0:
+        s = bin(i)[2:].zfill(32)
+    else:   # neg number
+        t = bin(0-i)[2:].zfill(32)
+        s = twos_comp(t)
+    return(s)
 
 def special_imm(inst):
     """Finds special immediate values for operation from dict"""
@@ -339,12 +347,40 @@ def add(core, inst):
 def halt(core, inst):
     core.set_offset(-1)
 
+def nxt(core, inst):
+    Rx = special_reg(inst)
+    Ry = special_reg_y(inst)
+    Rx_val = core.get_reg(Rx)
+    Ry_val = core.get_reg(Ry)
+
+    if Rx_val > 0:
+        Rx_val = (-1 * Rx_val) - Ry_val
+    else:
+        Rx_val = (-1 * Rx_val) + Ry_val
+
+    core.set_reg(Rx, Rx_val)
+
+def mtc(core, inst):
+    Rx = special_reg(inst)
+    Ry = special_reg_y(inst)
+    Rx_val = core.get_reg(Rx)
+    Ry_val = core.get_reg(Ry)
+
+    operand1_str = int_to_32bin_string(Rx_val)
+    operand2_str = int_to_32bin_string(Ry_val)
+
+    count = 0
+    for i in range(len(operand1_str)):
+        if operand1_str[i] == operand2_str[i]:
+            count += 1
+
+    core.set_reg(Rx, count)
 
 imm_vals = {
     # Dict of dicts containing all 'special' immediate values
     # i.e. any value that is not its literal value.
     'addi1': {
-        0: -23456,
+        0: 0,  # FREE
         1: 0xFEDC,
         2: 1,
         3: 3
@@ -424,6 +460,62 @@ reg_vals = {
         3: 3
     }
 }
+
+# reg_vals = {
+#     # Dict of dicts containing all 'special' register values
+#     # i.e. any register access that is not it's literal value.
+#     'addi1': {
+#         0: 8,
+#         1: 9,
+#         2: 10,
+#         3: 19
+#     },
+#     'addi2': {
+#         0: 15,
+#         1: 10,
+#         2: 17,
+#         3: 13
+#     },
+#     'sw': {
+#         0: 8,
+#         1: 10,
+#         2: 17,
+#         3: 19
+#     },
+#     'sub': {
+#         0: 8,
+#         1: 0,
+#         2: 17
+#     },
+#     'sltR01': {
+#         0: 0,
+#         1: 14,
+#         2: 17,
+#         3: 18
+#     },
+#     'sltR02': {
+#         0: 0,
+#         1: 8,
+#     },
+#     'add': {
+#         0: 8,
+#         1: 11,
+#         2: 17,
+#         3: 18
+#     },
+#     'sll': {
+#         0: 0,
+#         1: 14,
+#         2: 2,
+#         3: 3
+#     },
+#     'xor': {
+#         0: 14,
+#         1: 8,
+#         2: 2,
+#         3: 3
+#     }
+# }
 # def beq(core, inst):
 #     core._branch = core._branch + 1
 #
