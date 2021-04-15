@@ -8,22 +8,21 @@ class Instruction:
                '0001': 'init',
                '0010': 'init',
                '0011': 'init',
-               '0100': 'addi1',
-               '0101': 'addi2',
-               '0111': 'beqR0',
+               '0100': 'addi',
+               '0101': 'subi',
                '1000': 'bneR0',
                '1010': 'sll',
                '1111': 'halt'
                }
 
     # Add r type instructions here {op : name}
-    r_types = {'1001': 'sltR01',
-               '1110': 'sltR02',
-               '1011': 'xor',
-               '1100': 'sub',
+    r_types = {'1001': 'sltR0',
+               '1110': 'lw',
                '0110': 'sw',
-               '1101': 'add',
-               '11111': 'nxt'  # not in use
+               '1011': 'nxt',
+               '1100': 'sub',
+               '1101': 'mtc',
+               '0111': 'mov'
                }
 
     # Add j type instructions here {op : name}
@@ -93,7 +92,7 @@ class Instruction:
             self._rx = self._bin[2:4][::-1]
 
         # Get value for imm
-        if self._inst[:4] == 'addi' or self._inst == 'sll':
+        if self._inst[:4] == 'addi' or self._inst[:4] == 'subi' or self._inst == 'sll':
             self._imm = self._bin[:2][::-1]  # Take the last 2
         else:
             self._imm = self._bin[:4][::-1]  # Take the last 4
@@ -196,8 +195,12 @@ class Instruction:
         """Returns int value for immediate field."""
         return int(self._imm, 2)
 
+    def get_imm_twos(self):
+        """Returns int value for immediate field."""
+        return twos_comp(self._imm)
+
     def get_offset(self):
-        return self._twos_comp(self._imm) << 2
+        return self._twos_comp(self._imm)
 
 
 """
@@ -205,7 +208,7 @@ Helper functions and data for the operation functions
 """
 def twos_comp(x):   # string x of 0/1
     # find rightmost 1's index xxxx1000
-    if x is not str:
+    if type(x) is not str:
         x = bin(x)[2:]
 
     rightmost1_idx = -1
@@ -222,11 +225,11 @@ def twos_comp(x):   # string x of 0/1
     y = y_flip+y_same
     return y
 
-def int_to_32bin_string(i):
-    if i>=0:
-        s = bin(i)[2:].zfill(32)
+def int_to_16bin_string(num_int):
+    if num_int >= 0:
+        s = bin(num_int)[2:].zfill(16)
     else:   # neg number
-        t = bin(0-i)[2:].zfill(32)
+        t = bin(0 - num_int)[2:].zfill(16)
         s = twos_comp(t)
     return(s)
 
@@ -237,112 +240,90 @@ def special_imm(inst):
     else:
         return inst.get_imm()
 
-def special_reg(inst):
-    if inst.get_action() in reg_vals:
-        return reg_vals[inst.get_action()][inst.get_rx()]
-    else:
-        return inst.get_rx()
-
-def special_reg_y(inst):
-    if inst.get_action() in reg_vals:
-        return reg_vals[inst.get_action()][inst.get_ry()]
-    else:
-        return inst.get_ry()
-
-
 """
 Functions for each supported instructions. Each are indexed in a dictionary in the main 
 program file where they can be called automatically.
 """
 def init(core, inst):
     """Rx =- imm [-8,7]"""
-    core.set_reg(inst.get_rx(), twos_comp(inst.get_imm()))
+    # core.print_state()
+    # input()
+    core.set_reg(special_reg(inst), inst.get_imm())
 
-def addi1(core, inst):
+def mov(core, inst):
+    Rx = special_reg(inst)
+    Ry = special_reg_y(inst)
+    Ry_val = core.get_reg(Ry)
+    core.set_reg(Rx, Ry_val)
+
+def addi(core, inst):
     """Rx = Rx + imm{-1, 1, 4, 20, 32}"""
     s_reg = special_reg(inst)
     operand1 = core.get_reg(s_reg)
     operand2 = special_imm(inst)
     core.set_reg(special_reg(inst), operand1 + operand2)
 
-def addi2(core, inst):
+def subi(core, inst):
+    """Rx = Rx - imm"""
     s_reg = special_reg(inst)
     operand1 = core.get_reg(s_reg)
     operand2 = special_imm(inst)
-    core.set_reg(special_reg(inst), operand1 + operand2)
-
-def sw(core, inst):
-    address = special_reg_y(inst)
-    value = special_reg(inst)
-    core.set_mem(address, value)
-
-def beqR0(core, inst):
-    offset = int(twos_comp(inst.get_imm()), 2)
-    r0 = core.get_reg(0)
-    if r0 == 0:
-        core.set_offset(offset)
-
-def bneRO(core, inst):
-    offset = twos_comp(inst.get_imm())
-    r0 = core.get_reg(0)
-    if r0 != 0:
-        core.set_offset(offset)
-
-def sltR01(core, inst):
-    Rx_val = core.get_reg(special_reg(inst))
-    Ry_val = core.get_reg(special_reg_y(inst))
-    if Rx_val < Ry_val:
-        core.set_reg(0, 1)
-    else:
-        core.set_reg(0, 0)
-
-def sltR02(core, inst):
-    Rx_val = core.get_reg(special_reg(inst))
-    Ry_val = core.get_reg(special_reg_y(inst))
-    if Rx_val < Ry_val:
-        core.set_reg(0, 1)
-    else:
-        core.set_reg(0, 0)
-
-def sll(core, inst):
-    Rx = special_reg(inst)
-    Rx_val = core.get_reg(Rx)
-    imm = int(twos_comp(inst.get_imm()))
-    Rx_val = Rx_val << (imm + 1)
-    core.set_reg(Rx, Rx_val)
-
-def xor(core, inst):
-    Rx = special_reg(inst)
-    Ry = special_reg_y(inst)
-    Rx_val = core.get_reg(Rx)
-    Ry_val = core.get_reg(Ry)
-
-    # !!! vHIGHLY SUSPICIOUSv !!!
-    result = Rx_val ^ Ry_val
-    # !!! ^HIGHLY SUSPICIOUS^ !!!
-
-    core.set_reg(Rx, result)
+    core.set_reg(special_reg(inst), operand1 - operand2)
 
 def sub(core, inst):
     Rx = special_reg(inst)
     Ry = special_reg_y(inst)
     Rx_val = core.get_reg(Rx)
     Ry_val = core.get_reg(Ry)
+    core.set_reg(Rx, Rx_val - Ry_val)
 
-    result = Rx_val - Ry_val
+def sw(core, inst):
+    Ry = special_reg_y(inst)
+    address = core.get_reg(Ry)
+    Rx = special_reg(inst)
+    value = core.get_reg(Rx)
+    core.set_mem(address, value)
 
-    core.set_reg(Rx, result)
-
-def add(core, inst):
+def lw(core, inst):
     Rx = special_reg(inst)
     Ry = special_reg_y(inst)
-    Rx_val = core.get_reg(Rx)
     Ry_val = core.get_reg(Ry)
 
-    result = Rx_val + Ry_val
+    load_val = core.get_mem(Ry_val)
+    core.set_reg(Rx, load_val)
 
-    core.set_reg(Rx, result)
+def bneRO(core, inst):
+    #core.print_state()
+    #input()
+    offset = inst.get_offset()
+    #print('Offset: {}'.format(offset))
+    r0 = core.get_reg(0)
+    #print('r0: {}'.format(r0))
 
+    if offset < 0:
+        offset = offset - 1
+
+    if r0 != 0:
+        core.set_offset(offset)
+
+def sltR0(core, inst):
+    Rx_val = core.get_reg(special_reg(inst))
+    Ry_val = core.get_reg(special_reg_y(inst))
+    #print('Rx_val: {}'.format(Rx_val))
+    #print('Ry_val: {}'.format(Ry_val))
+    if Rx_val < Ry_val:
+        core.set_reg(0, 1)
+        #print('Set r0 to 1')
+    else:
+        core.set_reg(0, 0)
+        #print('Set r0 to 0')
+
+def sll(core, inst):
+    Rx = special_reg(inst)
+    Rx_val = core.get_reg(Rx)
+    imm = inst.get_imm()
+    Rx_val = Rx_val << imm
+    core.set_reg(Rx, Rx_val)
 
 def halt(core, inst):
     core.set_offset(-1)
@@ -354,9 +335,9 @@ def nxt(core, inst):
     Ry_val = core.get_reg(Ry)
 
     if Rx_val > 0:
-        Rx_val = (-1 * Rx_val) - Ry_val
+        Rx_val = (-1 * Rx_val) - (Ry_val + 1)
     else:
-        Rx_val = (-1 * Rx_val) + Ry_val
+        Rx_val = (-1 * Rx_val) + (Ry_val + 1)
 
     core.set_reg(Rx, Rx_val)
 
@@ -366,100 +347,73 @@ def mtc(core, inst):
     Rx_val = core.get_reg(Rx)
     Ry_val = core.get_reg(Ry)
 
-    operand1_str = int_to_32bin_string(Rx_val)
-    operand2_str = int_to_32bin_string(Ry_val)
+    #print('Rx_val: {}'.format(Rx_val))
+    #print('Ry_val: {}'.format(Ry_val))
+
+    operand1_str = int_to_16bin_string(Rx_val)
+    operand2_str = int_to_16bin_string(Ry_val)
+
+    #print('Rx_bin: {}'.format(operand1_str))
+    #print('Ry_bin: {}'.format(operand2_str))
 
     count = 0
     for i in range(len(operand1_str)):
+        #print('operand1[{}] = {}'.format(i, operand1_str[i]), end='\t')
+        #print('operand2[{}] = {}'.format(i, operand2_str[i]))
         if operand1_str[i] == operand2_str[i]:
+            #print('Incremented')
             count += 1
-
+    #print('Matches: {}'.format(count))
     core.set_reg(Rx, count)
+
+def special_reg(inst):
+    Rx = inst.get_rx()
+    if Rx == 0:
+        return 4
+    else:
+        return Rx
+    # if inst.get_action() in reg_vals:
+    #     return reg_vals[inst.get_action()][inst.get_rx()]
+    # else:
+    #     return inst.get_rx()
+
+def special_reg_y(inst):
+    Ry = inst.get_ry()
+    if Ry == 0:
+        return 4
+    else:
+        return Ry
+
+    # if inst.get_action() in reg_vals:
+    #     return reg_vals[inst.get_action()][inst.get_ry()]
+    # else:
+    #     return inst.get_ry()
+
 
 imm_vals = {
     # Dict of dicts containing all 'special' immediate values
     # i.e. any value that is not its literal value.
-    'addi1': {
-        0: 0,  # FREE
-        1: 0xFEDC,
-        2: 1,
-        3: 3
-    },
-    'addi2': {
+    'addi': {
         0: 32,
         1: 1,
-        2: -1,
-        3: 20
+        2: 2,
+        3: 3
     },
-    'bneR0': {
-        0: 2,
-        1: -5,
-        2: 5,
-        3: -29
+    'subi': {
+        0: 31,
+        1: 1,
+        2: 2,
+        3: 3
     },
     'beqR0': {
-        0: 4,
+        0: -6,
         1: 1,
         2: 2,
         3: 3
     }
 }
 
-reg_vals = {
-    # Dict of dicts containing all 'special' register values
-    # i.e. any register access that is not it's literal value.
-    'addi1': {
-        0: 8,
-        1: 9,
-        2: 10,
-        3: 19
-    },
-    'addi2': {
-        0: 15,
-        1: 10,
-        2: 17,
-        3: 13
-    },
-    'sw': {
-        0: 8,
-        1: 10,
-        2: 17,
-        3: 19
-    },
-    'sub': {
-        0: 8,
-        1: 0,
-        2: 17
-    },
-    'sltR01': {
-        0: 0,
-        1: 14,
-        2: 17,
-        3: 18
-    },
-    'sltR02': {
-        0: 0,
-        1: 8,
-    },
-    'add': {
-        0: 8,
-        1: 11,
-        2: 17,
-        3: 18
-    },
-    'sll': {
-        0: 0,
-        1: 14,
-        2: 2,
-        3: 3
-    },
-    'xor': {
-        0: 14,
-        1: 8,
-        2: 2,
-        3: 3
-    }
-}
+
 
 # reg_vals = {
 #     # Dict of dicts containing all 'special' register values

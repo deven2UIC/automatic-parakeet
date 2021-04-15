@@ -2,7 +2,7 @@ import Instruction
 
 
 class ISA:
-    _regs = [0] * 20  # 20 registers
+    _regs = [0] * 5  # 20 registers
     _mem = [0] * 256  # 256 memory locations
     _mem_history = {}
     _regs_history = {}
@@ -16,7 +16,7 @@ class ISA:
 
     class ProgramState:
         """Holds previous program states including register/memory content and stats"""
-        regs = [0] * 20  # 20 registers
+        regs = [0] * 5  # 20 registers
         mem = [0] * 256  # 256 memory locations
 
         total = 0
@@ -39,17 +39,17 @@ class ISA:
     _state_history = {}
 
     _actions = {'init': Instruction.init,
-                'addi1': Instruction.addi1,
-                'addi2': Instruction.addi2,
-                'sw': Instruction.sw,
-                'beqR0': Instruction.beqR0,
-                'bneR0': Instruction.bneRO,
-                'sltR01': Instruction.sltR01,
-                'sltR02': Instruction.sltR02,
-                'sll': Instruction.sll,
-                'xor': Instruction.xor,
+                'addi': Instruction.addi,
+                'subi': Instruction.subi,
                 'sub': Instruction.sub,
-                'add': Instruction.add,
+                'sw': Instruction.sw,
+                'lw': Instruction.lw,
+                'bneR0': Instruction.bneRO,
+                'sltR0': Instruction.sltR0,
+                'sll': Instruction.sll,
+                'nxt': Instruction.nxt,
+                'mtc': Instruction.mtc,
+                'mov': Instruction.mov,
                 'halt': Instruction.halt,
                 }
 
@@ -115,7 +115,7 @@ class ISA:
             if self._offset == -1:
                 return False
 
-            self._regs[0] = 0  # $0 = 0 always
+            #self._regs[0] = 0  # $0 = 0 always
             self._PC = self._PC + self._offset + 1  # Increment PC
             self._offset = 0  # Return offset to 0 after potential branch
             self._total = self._total + 1
@@ -140,8 +140,10 @@ class ISA:
                 self._PC = self._PC_last
                 if self._error:
                     print("Program terminated with errors, printing end state...PC={}".format(self._PC))
+                    self.print_state()
                 else:
                     print("Program terminated successfully, printing end state...PC={}".format(self._PC))
+                    self.print_state()
                 self._save_cur_state()
                 #self.print_state()
                 return
@@ -154,7 +156,7 @@ class ISA:
                 self._program[self._PC].get_action()
             ](self, self._program[self._PC])  # Execute instruction
 
-            self._regs[0] = 0  # $0 = 0 always
+            # self._regs[0] = 0  # $0 = 0 always
             self._PC = self._PC + self._offset + 1  # Increment PC
             self._offset = 0  # Return offset to 0 after potential branch
             self._total = self._total + 1
@@ -214,7 +216,10 @@ class ISA:
 
     def set_reg(self, reg, val):
         """Set register reg with 'val'"""
+        # print('Reg: {}'.format(reg))
+        # print('Val: {}'.format(val))
         self._regs[reg] = val
+        # print('Reg{}= {}'.format(reg, self._regs[reg]))
 
     def get_reg(self, reg):
         """Get value of register 'reg'"""
@@ -244,10 +249,22 @@ class ISA:
         """Prints memory content."""
         print('Memory:')
         mem_index = 0
-        for i in range(0, len(self._mem)):
+        #for i in range(0, len(self._mem)):
+        for i in range(0, 64):
             print('0x{}: {:5d}|'.format(hex(i * 0x4)[2:].zfill(3), self._mem[i]), end='')
             if i % 8 == 7:
                 print()
+
+    def print_mem_array(self):
+        """Prints memory content."""
+        print('Memory:')
+        mem_index = 0
+        #for i in range(0, len(self._mem)):
+        for i in range(0, 64):
+            print('A[{}]: {:4d}|'.format(str(i).zfill(2), self._mem[i]), end='')
+            if i % 10 == 9:
+                print()
+        print()
 
     def print_mem_nonzero(self):
         """Prints memory content."""
@@ -265,15 +282,7 @@ class ISA:
     def print_regs(self):
         """Prints register content."""
         print('Registers:')
-        for i in range(0, 8):
-            print('${} = {}'.format(i, self._regs[i]), end='\t')
-        print()
-
-        for i in range(8, 16):
-            print('${} = {}'.format(i, self._regs[i]), end='\t')
-        print()
-
-        for i in range(16, 20):
+        for i in range(0, 5):
             print('${} = {}'.format(i, self._regs[i]), end='\t')
         print()
 
@@ -287,7 +296,7 @@ class ISA:
 
         print('PC: {}\tJust executed: {}\tLoaded instruction: {}'.format(self._PC, prev_inst, cur_inst.get_inst()))
         self.print_regs()
-        self.print_mem_nonzero()
+        self.print_mem_array()
         self.print_stats()
         print('********************** Program State END ******************************\n'.format(self._PC))
 
