@@ -92,7 +92,7 @@ class Instruction:
             self._rx = self._bin[2:4][::-1]
 
         # Get value for imm
-        if self._inst[:4] == 'addi' or self._inst == 'sll':
+        if self._inst[:4] == 'addi' or self._inst[:4] == 'subi' or self._inst == 'sll':
             self._imm = self._bin[:2][::-1]  # Take the last 2
         else:
             self._imm = self._bin[:4][::-1]  # Take the last 4
@@ -208,7 +208,7 @@ Helper functions and data for the operation functions
 """
 def twos_comp(x):   # string x of 0/1
     # find rightmost 1's index xxxx1000
-    if x is not str:
+    if type(x) is not str:
         x = bin(x)[2:]
 
     rightmost1_idx = -1
@@ -225,11 +225,11 @@ def twos_comp(x):   # string x of 0/1
     y = y_flip+y_same
     return y
 
-def int_to_32bin_string(i):
-    if i>=0:
-        s = bin(i)[2:].zfill(32)
+def int_to_16bin_string(num_int):
+    if num_int >= 0:
+        s = bin(num_int)[2:].zfill(16)
     else:   # neg number
-        t = bin(0-i)[2:].zfill(32)
+        t = bin(0 - num_int)[2:].zfill(16)
         s = twos_comp(t)
     return(s)
 
@@ -240,14 +240,15 @@ def special_imm(inst):
     else:
         return inst.get_imm()
 
-
 """
 Functions for each supported instructions. Each are indexed in a dictionary in the main 
 program file where they can be called automatically.
 """
 def init(core, inst):
     """Rx =- imm [-8,7]"""
-    core.set_reg(inst.get_rx(), inst.get_imm())
+    # core.print_state()
+    # input()
+    core.set_reg(special_reg(inst), inst.get_imm())
 
 def addi(core, inst):
     """Rx = Rx + imm{-1, 1, 4, 20, 32}"""
@@ -366,14 +367,23 @@ def mtc(core, inst):
     Rx_val = core.get_reg(Rx)
     Ry_val = core.get_reg(Ry)
 
-    operand1_str = int_to_32bin_string(Rx_val)
-    operand2_str = int_to_32bin_string(Ry_val)
+    print('Rx_val: {}'.format(Rx_val))
+    print('Ry_val: {}'.format(Ry_val))
+
+    operand1_str = int_to_16bin_string(Rx_val)
+    operand2_str = int_to_16bin_string(Ry_val)
+
+    print('Rx_bin: {}'.format(operand1_str))
+    print('Ry_bin: {}'.format(operand2_str))
 
     count = 0
     for i in range(len(operand1_str)):
+        #print('operand1[{}] = {}'.format(i, operand1_str[i]), end='\t')
+        #print('operand2[{}] = {}'.format(i, operand2_str[i]))
         if operand1_str[i] == operand2_str[i]:
+            #print('Incremented')
             count += 1
-
+    print('Matches: {}'.format(count))
     core.set_reg(Rx, count)
 
 def special_reg(inst):
@@ -404,13 +414,13 @@ imm_vals = {
     # Dict of dicts containing all 'special' immediate values
     # i.e. any value that is not its literal value.
     'addi': {
-        0: 32,  # FREE
+        0: 32,
         1: 1,
         2: 2,
         3: 3
     },
     'subi': {
-        0: 32,  # FREE
+        0: 31,
         1: 1,
         2: 2,
         3: 3

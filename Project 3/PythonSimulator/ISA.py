@@ -247,10 +247,22 @@ class ISA:
         """Prints memory content."""
         print('Memory:')
         mem_index = 0
-        for i in range(0, len(self._mem)):
+        #for i in range(0, len(self._mem)):
+        for i in range(0, 64):
             print('0x{}: {:5d}|'.format(hex(i * 0x4)[2:].zfill(3), self._mem[i]), end='')
             if i % 8 == 7:
                 print()
+
+    def print_mem_array(self):
+        """Prints memory content."""
+        print('Memory:')
+        mem_index = 0
+        #for i in range(0, len(self._mem)):
+        for i in range(0, 64):
+            print('A[{}]: {:4d}|'.format(str(i).zfill(2), self._mem[i]), end='')
+            if i % 10 == 9:
+                print()
+        print()
 
     def print_mem_nonzero(self):
         """Prints memory content."""
@@ -282,7 +294,7 @@ class ISA:
 
         print('PC: {}\tJust executed: {}\tLoaded instruction: {}'.format(self._PC, prev_inst, cur_inst.get_inst()))
         self.print_regs()
-        self.print_mem_nonzero()
+        self.print_mem_array()
         self.print_stats()
         print('********************** Program State END ******************************\n'.format(self._PC))
 

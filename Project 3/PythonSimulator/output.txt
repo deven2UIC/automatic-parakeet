@@ -9,8 +9,29 @@ addi $2, 1
 sltR0 $2, $3
 bneR0 12
 sw $1, $2
-init $2, 8
-sll $2, 2
-init $3, 12
-sll $3, 2
-addi $3, 3
+init $2, 0
+init $2, 0
+init $3, 5
+sll $3, 1
+sll $3, 1
+init $4, 15
+sll $4, 2
+addi $4, 3
+sll $4, 2
+addi $4, 2
+sll $4, 2
+addi $4, 3
+sll $4, 2
+addi $4, 1
+sll $4, 2
+addi $4, 3
+sll $4, 2
+lw $1, $2
+mtc $1, $4
+addi $2, 32
+sw $1, $2
+subi $2, 31
+sltR0 $2, $3
+bneR0 10
+sw $1, $2
+halt $3, 15
