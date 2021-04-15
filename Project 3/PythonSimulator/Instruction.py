@@ -10,7 +10,6 @@ class Instruction:
                '0011': 'init',
                '0100': 'addi',
                '0101': 'subi',
-               # '0111': 'srl',
                '1000': 'bneR0',
                '1010': 'sll',
                '1111': 'halt'
@@ -23,6 +22,7 @@ class Instruction:
                '1011': 'nxt',
                '1100': 'sub',
                '1101': 'mtc',
+               '0111': 'mov'
                }
 
     # Add j type instructions here {op : name}
@@ -250,6 +250,12 @@ def init(core, inst):
     # input()
     core.set_reg(special_reg(inst), inst.get_imm())
 
+def mov(core, inst):
+    Rx = special_reg(inst)
+    Ry = special_reg_y(inst)
+    Ry_val = core.get_reg(Ry)
+    core.set_reg(Rx, Ry_val)
+
 def addi(core, inst):
     """Rx = Rx + imm{-1, 1, 4, 20, 32}"""
     s_reg = special_reg(inst)
@@ -263,6 +269,13 @@ def subi(core, inst):
     operand1 = core.get_reg(s_reg)
     operand2 = special_imm(inst)
     core.set_reg(special_reg(inst), operand1 - operand2)
+
+def sub(core, inst):
+    Rx = special_reg(inst)
+    Ry = special_reg_y(inst)
+    Rx_val = core.get_reg(Rx)
+    Ry_val = core.get_reg(Ry)
+    core.set_reg(Rx, Rx_val - Ry_val)
 
 def sw(core, inst):
     Ry = special_reg_y(inst)
@@ -312,39 +325,6 @@ def sll(core, inst):
     Rx_val = Rx_val << imm
     core.set_reg(Rx, Rx_val)
 
-def xor(core, inst):
-    Rx = special_reg(inst)
-    Ry = special_reg_y(inst)
-    Rx_val = core.get_reg(Rx)
-    Ry_val = core.get_reg(Ry)
-
-    # !!! vHIGHLY SUSPICIOUSv !!!
-    result = Rx_val ^ Ry_val
-    # !!! ^HIGHLY SUSPICIOUS^ !!!
-
-    core.set_reg(Rx, result)
-
-def sub(core, inst):
-    Rx = special_reg(inst)
-    Ry = special_reg_y(inst)
-    Rx_val = core.get_reg(Rx)
-    Ry_val = core.get_reg(Ry)
-
-    result = Rx_val - Ry_val
-
-    core.set_reg(Rx, result)
-
-def add(core, inst):
-    Rx = special_reg(inst)
-    Ry = special_reg_y(inst)
-    Rx_val = core.get_reg(Rx)
-    Ry_val = core.get_reg(Ry)
-
-    result = Rx_val + Ry_val
-
-    core.set_reg(Rx, result)
-
-
 def halt(core, inst):
     core.set_offset(-1)
 
@@ -367,14 +347,14 @@ def mtc(core, inst):
     Rx_val = core.get_reg(Rx)
     Ry_val = core.get_reg(Ry)
 
-    print('Rx_val: {}'.format(Rx_val))
-    print('Ry_val: {}'.format(Ry_val))
+    #print('Rx_val: {}'.format(Rx_val))
+    #print('Ry_val: {}'.format(Ry_val))
 
     operand1_str = int_to_16bin_string(Rx_val)
     operand2_str = int_to_16bin_string(Ry_val)
 
-    print('Rx_bin: {}'.format(operand1_str))
-    print('Ry_bin: {}'.format(operand2_str))
+    #print('Rx_bin: {}'.format(operand1_str))
+    #print('Ry_bin: {}'.format(operand2_str))
 
     count = 0
     for i in range(len(operand1_str)):
@@ -383,7 +363,7 @@ def mtc(core, inst):
         if operand1_str[i] == operand2_str[i]:
             #print('Incremented')
             count += 1
-    print('Matches: {}'.format(count))
+    #print('Matches: {}'.format(count))
     core.set_reg(Rx, count)
 
 def special_reg(inst):

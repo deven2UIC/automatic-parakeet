@@ -41,6 +41,7 @@ class ISA:
     _actions = {'init': Instruction.init,
                 'addi': Instruction.addi,
                 'subi': Instruction.subi,
+                'sub': Instruction.sub,
                 'sw': Instruction.sw,
                 'lw': Instruction.lw,
                 'bneR0': Instruction.bneRO,
@@ -48,6 +49,7 @@ class ISA:
                 'sll': Instruction.sll,
                 'nxt': Instruction.nxt,
                 'mtc': Instruction.mtc,
+                'mov': Instruction.mov,
                 'halt': Instruction.halt,
                 }
 

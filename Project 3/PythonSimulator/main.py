@@ -16,9 +16,9 @@ def print_menu():
 
 def print_file_menu():
     print('Which file would you like to run?')
-    print('\t 1) test')
-    print('\t 2) Target Match')
-    print('\t 3) Full project 3')
+    print('\t 1) Full project 3')
+    print('\t 2) Toy')
+    print('\t 3) N/A')
     print('\t 4) N/A')
     print('\t 5) N/A')
     print('\t 6) N/A')
@@ -31,17 +31,17 @@ program_file = ''
 
 while entry != -1:
     if entry == 1:
-        program_file = 'test.txt'
+        program_file = 'eatm.txt'
     elif entry == 2:
-        program_file = 'target_match.txt'
+        program_file = 'toy.txt'
     elif entry == 3:
-        program_file = 'all.txt'
+        program_file = 'N/A'
     elif entry == 4:
-        program_file = 'branch_hex.txt'
+        program_file = 'N/A'
     elif entry == 5:
-        program_file = 'memaccess_hex.txt'
+        program_file = 'N/A'
     elif entry == 6:
-        program_file = 'special_hex.txt'
+        program_file = 'N/A'
 
     print('Enter output file name (default output.txt):')
     output_file = input()
