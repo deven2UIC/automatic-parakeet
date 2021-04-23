@@ -1,4 +1,6 @@
 import Instruction
+import Memory
+
 
 class ISA:
     _regs = [0] * 32

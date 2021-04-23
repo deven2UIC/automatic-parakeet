@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="04179a08-56d5-42bd-a37e-f8599d3d617a" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/ISA.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Scripts/Memory.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CompOrg.py" beforeDir="false" afterPath="$PROJECT_DIR$/Instruction.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
