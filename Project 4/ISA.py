@@ -4,7 +4,7 @@ import Memory
 
 class ISA:
     _regs = [0] * 32
-    _mem = [0] * 32 * 8
+    # _mem = [0] * 32 * 8
     _mem_history = {}
     _regs_history = {}
 
@@ -59,11 +59,14 @@ class ISA:
                 'mtc': Instruction.mtc
                 }
 
-    def __init__(self, in_filename, out_filename):
+    def __init__(self, in_filename, out_filename, mem_config=0):
         # Set initial values for MIPS engine
         self._offset = 0
         self._program = {}
         self._PC = 0
+
+        # Initialize memory configuration
+        self._mem = Memory.Memory(mem_config)
 
         # Read in hex file
         self._f = open(in_filename)
@@ -147,6 +150,12 @@ class ISA:
         else:
             print('Error: Already at beginning\n')
 
+    def read_mem(self, add):
+        return self._mem.read(add * 4)
+
+    def write_mem(self, add, val):
+        self._mem.write(add * 4, val)
+
     def _save_cur_state(self):
         # regs, mem, total, alu, jump, branch, memory, other)
         _cur_state = self.ProgramState(self._regs, self._mem, self._total, self._ALU, self._jump,
@@ -187,13 +196,8 @@ class ISA:
 
     def print_mem(self):
         """Prints memory content."""
-        print('Memory:')
-        mem_index = 0
-        for i in range(0, len(self._mem), 0x20):
-            for j in range(0, 0x20, 4):
-                print('{}: {:5d}'.format(hex(i + j + 0x2000), self._mem[mem_index]), end='\t')
-                mem_index = mem_index + 1
-            print()
+        self._mem.print_cache()
+        self._mem.print_mem()
 
     def print_regs(self):
         """Prints register content."""
@@ -231,6 +235,6 @@ class ISA:
 
         print('PC: {}\tJust executed: {}\tLoaded instruction: {}'.format(self._PC, prev_inst, cur_inst.get_inst()))
         self.print_regs()
-        self.print_mem()
-        self.print_stats()
+        # self.print_mem()
+        # self.print_stats()
         print('********************** Program State END ******************************\n'.format(self._PC))

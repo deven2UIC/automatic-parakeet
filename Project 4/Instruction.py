@@ -224,7 +224,7 @@ def lw(core, inst):
     core._memory = core._memory + 1
 
     mem_address = int((core._regs[inst.get_rs()] + inst.get_imm() - 0x2000) / 4)
-    core._regs[inst.get_rt()] = core._mem[mem_address]
+    core._regs[inst.get_rt()] = core.read_mem(mem_address)
 
 
 def sw(core, inst):
@@ -233,8 +233,8 @@ def sw(core, inst):
     #print('$rs = {}'.format(core._regs[inst.get_rs()]))
     #print('Offset: {}'.format(inst.get_imm()))
     mem_address = int((core._regs[inst.get_rs()] + inst.get_imm() - 0x2000) / 4)
-    #print('Mem Address: {}'.format(mem_address))
-    core._mem[mem_address] = core._regs[inst.get_rt()]
+    print('Mem Address: {}'.format(mem_address))
+    core.write_mem(mem_address, core._regs[inst.get_rt()])
     #core.print_state()
     #print()
 

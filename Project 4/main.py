@@ -28,7 +28,7 @@ print_file_menu()
 entry = int(input())
 program_file = ''
 
-while (entry != '-1'):
+while entry != '-1':
     if entry == 1:
         program_file = 'project1.txt'
     elif entry == 2:
@@ -49,7 +49,7 @@ while (entry != '-1'):
     print()
 
     while entry != '-1':
-        if (entry == ""):
+        if entry == "":
             mips.step()
         elif entry == '.':
             mips.step_back()
