@@ -1,0 +1,387 @@
+CACHE READ	ADDRESS: 0b110100\0x34
+	Outcome: MISS	Replaced Tag: 3
+	Access Count: 1	Hit Count: 0	Miss Count: 1
+
+CACHE READ	ADDRESS: 0b110000\0x30
+	Outcome: HIT
+	Access Count: 2	Hit Count: 1	Miss Count: 1
+
+CACHE READ	ADDRESS: 0b101100\0x2c
+	Outcome: MISS	Replaced Tag: 2
+	Access Count: 3	Hit Count: 1	Miss Count: 2
+
+CACHE READ	ADDRESS: 0b101000\0x28
+	Outcome: HIT
+	Access Count: 4	Hit Count: 2	Miss Count: 2
+
+CACHE READ	ADDRESS: 0b100100\0x24
+	Outcome: HIT
+	Access Count: 5	Hit Count: 3	Miss Count: 2
+
+CACHE READ	ADDRESS: 0b100000\0x20
+	Outcome: HIT
+	Access Count: 6	Hit Count: 4	Miss Count: 2
+
+CACHE READ	ADDRESS: 0b11100\0x1c
+	Outcome: MISS	Replaced Tag: 1
+	Access Count: 7	Hit Count: 4	Miss Count: 3
+
+CACHE READ	ADDRESS: 0b11000\0x18
+	Outcome: HIT
+	Access Count: 8	Hit Count: 5	Miss Count: 3
+
+CACHE READ	ADDRESS: 0b10100\0x14
+	Outcome: HIT
+	Access Count: 9	Hit Count: 6	Miss Count: 3
+
+CACHE READ	ADDRESS: 0b10000\0x10
+	Outcome: HIT
+	Access Count: 10	Hit Count: 7	Miss Count: 3
+
+CACHE READ	ADDRESS: 0b1100\0xc
+	Outcome: MISS	Replaced Tag: 0
+	Access Count: 11	Hit Count: 7	Miss Count: 4
+
+CACHE READ	ADDRESS: 0b1000\0x8
+	Outcome: HIT
+	Access Count: 12	Hit Count: 8	Miss Count: 4
+
+CACHE READ	ADDRESS: 0b100\0x4
+	Outcome: HIT
+	Access Count: 13	Hit Count: 9	Miss Count: 4
+
+CACHE READ	ADDRESS: 0b0\0x0
+	Outcome: HIT
+	Access Count: 14	Hit Count: 10	Miss Count: 4
+
+CACHE READ	ADDRESS: 0b0\0x0
+	Outcome: HIT
+	Access Count: 15	Hit Count: 11	Miss Count: 4
+
+CACHE READ	ADDRESS: 0b0\0x0
+	Outcome: HIT
+	Access Count: 16	Hit Count: 12	Miss Count: 4
+
+CACHE READ	ADDRESS: 0b100\0x4
+	Outcome: HIT
+	Access Count: 17	Hit Count: 13	Miss Count: 4
+
+CACHE READ	ADDRESS: 0b1000\0x8
+	Outcome: HIT
+	Access Count: 18	Hit Count: 14	Miss Count: 4
+
+CACHE READ	ADDRESS: 0b101110100\0x174
+	Outcome: MISS	Replaced Tag: 4
+	Access Count: 19	Hit Count: 14	Miss Count: 5
+
+CACHE READ	ADDRESS: 0b100\0x4
+	Outcome: HIT
+	Access Count: 20	Hit Count: 15	Miss Count: 5
+
+CACHE READ	ADDRESS: 0b100\0x4
+	Outcome: HIT
+	Access Count: 21	Hit Count: 16	Miss Count: 5
+
+CACHE READ	ADDRESS: 0b1000\0x8
+	Outcome: HIT
+	Access Count: 22	Hit Count: 17	Miss Count: 5
+
+CACHE READ	ADDRESS: 0b1100\0xc
+	Outcome: HIT
+	Access Count: 23	Hit Count: 18	Miss Count: 5
+
+CACHE READ	ADDRESS: 0b110100000\0x1a0
+	Outcome: MISS	Replaced Tag: 5
+	Access Count: 24	Hit Count: 18	Miss Count: 6
+
+CACHE READ	ADDRESS: 0b1000\0x8
+	Outcome: HIT
+	Access Count: 25	Hit Count: 19	Miss Count: 6
+
+CACHE READ	ADDRESS: 0b1000\0x8
+	Outcome: HIT
+	Access Count: 26	Hit Count: 20	Miss Count: 6
+
+CACHE READ	ADDRESS: 0b1100\0xc
+	Outcome: HIT
+	Access Count: 27	Hit Count: 21	Miss Count: 6
+
+CACHE READ	ADDRESS: 0b10000\0x10
+	Outcome: HIT
+	Access Count: 28	Hit Count: 22	Miss Count: 6
+
+CACHE READ	ADDRESS: 0b111001100\0x1cc
+	Outcome: MISS	Replaced Tag: 6
+	Access Count: 29	Hit Count: 22	Miss Count: 7
+
+CACHE READ	ADDRESS: 0b1100\0xc
+	Outcome: HIT
+	Access Count: 30	Hit Count: 23	Miss Count: 7
+
+CACHE READ	ADDRESS: 0b1100\0xc
+	Outcome: HIT
+	Access Count: 31	Hit Count: 24	Miss Count: 7
+
+CACHE READ	ADDRESS: 0b10000\0x10
+	Outcome: HIT
+	Access Count: 32	Hit Count: 25	Miss Count: 7
+
+CACHE READ	ADDRESS: 0b10100\0x14
+	Outcome: HIT
+	Access Count: 33	Hit Count: 26	Miss Count: 7
+
+CACHE READ	ADDRESS: 0b111111000\0x1f8
+	Outcome: MISS	Replaced Tag: 7
+	Access Count: 34	Hit Count: 26	Miss Count: 8
+
+CACHE READ	ADDRESS: 0b10000\0x10
+	Outcome: HIT
+	Access Count: 35	Hit Count: 27	Miss Count: 8
+
+CACHE READ	ADDRESS: 0b10000\0x10
+	Outcome: HIT
+	Access Count: 36	Hit Count: 28	Miss Count: 8
+
+CACHE READ	ADDRESS: 0b10100\0x14
+	Outcome: HIT
+	Access Count: 37	Hit Count: 29	Miss Count: 8
+
+CACHE READ	ADDRESS: 0b11000\0x18
+	Outcome: HIT
+	Access Count: 38	Hit Count: 30	Miss Count: 8
+
+CACHE READ	ADDRESS: 0b1000100100\0x224
+	Outcome: MISS	Replaced Tag: 3
+	Access Count: 39	Hit Count: 30	Miss Count: 9
+
+CACHE READ	ADDRESS: 0b10100\0x14
+	Outcome: HIT
+	Access Count: 40	Hit Count: 31	Miss Count: 9
+
+CACHE READ	ADDRESS: 0b10100\0x14
+	Outcome: HIT
+	Access Count: 41	Hit Count: 32	Miss Count: 9
+
+CACHE READ	ADDRESS: 0b11000\0x18
+	Outcome: HIT
+	Access Count: 42	Hit Count: 33	Miss Count: 9
+
+CACHE READ	ADDRESS: 0b11100\0x1c
+	Outcome: HIT
+	Access Count: 43	Hit Count: 34	Miss Count: 9
+
+CACHE READ	ADDRESS: 0b1001010000\0x250
+	Outcome: MISS	Replaced Tag: 2
+	Access Count: 44	Hit Count: 34	Miss Count: 10
+
+CACHE READ	ADDRESS: 0b11000\0x18
+	Outcome: HIT
+	Access Count: 45	Hit Count: 35	Miss Count: 10
+
+CACHE READ	ADDRESS: 0b11000\0x18
+	Outcome: HIT
+	Access Count: 46	Hit Count: 36	Miss Count: 10
+
+CACHE READ	ADDRESS: 0b11100\0x1c
+	Outcome: HIT
+	Access Count: 47	Hit Count: 37	Miss Count: 10
+
+CACHE READ	ADDRESS: 0b100000\0x20
+	Outcome: HIT
+	Access Count: 48	Hit Count: 37	Miss Count: 11
+
+CACHE READ	ADDRESS: 0b1001111100\0x27c
+	Outcome: MISS	Replaced Tag: 26
+	Access Count: 49	Hit Count: 37	Miss Count: 12
+
+CACHE READ	ADDRESS: 0b11100\0x1c
+	Outcome: HIT
+	Access Count: 50	Hit Count: 38	Miss Count: 12
+
+CACHE READ	ADDRESS: 0b11100\0x1c
+	Outcome: HIT
+	Access Count: 51	Hit Count: 39	Miss Count: 12
+
+CACHE READ	ADDRESS: 0b100000\0x20
+	Outcome: HIT
+	Access Count: 52	Hit Count: 40	Miss Count: 12
+
+CACHE READ	ADDRESS: 0b100100\0x24
+	Outcome: HIT
+	Access Count: 53	Hit Count: 41	Miss Count: 12
+
+CACHE READ	ADDRESS: 0b1010101000\0x2a8
+	Outcome: MISS	Replaced Tag: 28
+	Access Count: 54	Hit Count: 41	Miss Count: 13
+
+CACHE READ	ADDRESS: 0b100000\0x20
+	Outcome: HIT
+	Access Count: 55	Hit Count: 42	Miss Count: 13
+
+CACHE READ	ADDRESS: 0b100000\0x20
+	Outcome: HIT
+	Access Count: 56	Hit Count: 43	Miss Count: 13
+
+CACHE READ	ADDRESS: 0b100100\0x24
+	Outcome: HIT
+	Access Count: 57	Hit Count: 44	Miss Count: 13
+
+CACHE READ	ADDRESS: 0b101000\0x28
+	Outcome: HIT
+	Access Count: 58	Hit Count: 45	Miss Count: 13
+
+CACHE READ	ADDRESS: 0b1011010100\0x2d4
+	Outcome: MISS	Replaced Tag: 0
+	Access Count: 59	Hit Count: 45	Miss Count: 14
+
+CACHE READ	ADDRESS: 0b100100\0x24
+	Outcome: HIT
+	Access Count: 60	Hit Count: 46	Miss Count: 14
+
+CACHE READ	ADDRESS: 0b100100\0x24
+	Outcome: HIT
+	Access Count: 61	Hit Count: 47	Miss Count: 14
+
+CACHE READ	ADDRESS: 0b101000\0x28
+	Outcome: HIT
+	Access Count: 62	Hit Count: 48	Miss Count: 14
+
+CACHE READ	ADDRESS: 0b101100\0x2c
+	Outcome: HIT
+	Access Count: 63	Hit Count: 49	Miss Count: 14
+
+CACHE READ	ADDRESS: 0b1100000000\0x300
+	Outcome: MISS	Replaced Tag: 31
+	Access Count: 64	Hit Count: 49	Miss Count: 15
+
+CACHE READ	ADDRESS: 0b101000\0x28
+	Outcome: HIT
+	Access Count: 65	Hit Count: 50	Miss Count: 15
+
+CACHE READ	ADDRESS: 0b101000\0x28
+	Outcome: HIT
+	Access Count: 66	Hit Count: 51	Miss Count: 15
+
+CACHE READ	ADDRESS: 0b101100\0x2c
+	Outcome: HIT
+	Access Count: 67	Hit Count: 52	Miss Count: 15
+
+CACHE READ	ADDRESS: 0b110000\0x30
+	Outcome: HIT
+	Access Count: 68	Hit Count: 52	Miss Count: 16
+
+CACHE READ	ADDRESS: 0b1100101100\0x32c
+	Outcome: MISS	Replaced Tag: 37
+	Access Count: 69	Hit Count: 52	Miss Count: 17
+
+CACHE READ	ADDRESS: 0b101100\0x2c
+	Outcome: HIT
+	Access Count: 70	Hit Count: 53	Miss Count: 17
+
+CACHE READ	ADDRESS: 0b101100\0x2c
+	Outcome: HIT
+	Access Count: 71	Hit Count: 54	Miss Count: 17
+
+CACHE READ	ADDRESS: 0b110000\0x30
+	Outcome: HIT
+	Access Count: 72	Hit Count: 55	Miss Count: 17
+
+CACHE READ	ADDRESS: 0b110100\0x34
+	Outcome: HIT
+	Access Count: 73	Hit Count: 56	Miss Count: 17
+
+CACHE READ	ADDRESS: 0b1101011000\0x358
+	Outcome: MISS	Replaced Tag: 39
+	Access Count: 74	Hit Count: 56	Miss Count: 18
+
+CACHE READ	ADDRESS: 0b110000\0x30
+	Outcome: HIT
+	Access Count: 75	Hit Count: 57	Miss Count: 18
+
+CACHE READ	ADDRESS: 0b110000\0x30
+	Outcome: HIT
+	Access Count: 76	Hit Count: 58	Miss Count: 18
+
+CACHE READ	ADDRESS: 0b110100\0x34
+	Outcome: HIT
+	Access Count: 77	Hit Count: 59	Miss Count: 18
+
+CACHE READ	ADDRESS: 0b111000\0x38
+	Outcome: HIT
+	Access Count: 78	Hit Count: 60	Miss Count: 18
+
+CACHE READ	ADDRESS: 0b1110000100\0x384
+	Outcome: MISS	Replaced Tag: 1
+	Access Count: 79	Hit Count: 60	Miss Count: 19
+
+CACHE READ	ADDRESS: 0b110100\0x34
+	Outcome: HIT
+	Access Count: 80	Hit Count: 61	Miss Count: 19
+
+CACHE READ	ADDRESS: 0b110100\0x34
+	Outcome: HIT
+	Access Count: 81	Hit Count: 62	Miss Count: 19
+
+CACHE READ	ADDRESS: 0b111000\0x38
+	Outcome: HIT
+	Access Count: 82	Hit Count: 63	Miss Count: 19
+
+CACHE READ	ADDRESS: 0b111100\0x3c
+	Outcome: HIT
+	Access Count: 83	Hit Count: 64	Miss Count: 19
+
+CACHE READ	ADDRESS: 0b1110110000\0x3b0
+	Outcome: MISS	Replaced Tag: 42
+	Access Count: 84	Hit Count: 64	Miss Count: 20
+
+CACHE READ	ADDRESS: 0b111000\0x38
+	Outcome: HIT
+	Access Count: 85	Hit Count: 65	Miss Count: 20
+
+CACHE READ	ADDRESS: 0b111000\0x38
+	Outcome: HIT
+	Access Count: 86	Hit Count: 66	Miss Count: 20
+
+CACHE READ	ADDRESS: 0b111100\0x3c
+	Outcome: HIT
+	Access Count: 87	Hit Count: 67	Miss Count: 20
+
+CACHE READ	ADDRESS: 0b1000000\0x40
+	Outcome: HIT
+	Access Count: 88	Hit Count: 67	Miss Count: 21
+
+CACHE READ	ADDRESS: 0b1111011100\0x3dc
+	Outcome: MISS	Replaced Tag: 48
+	Access Count: 89	Hit Count: 67	Miss Count: 22
+
+===================Mem Contents====================
+0x 0:   -99	0x 4:    82	0x 8:  -103	0x c:    94	0x10:   -99	0x14:    98	0x18:  -135	0x1c:   142	
+0x20:  -163	0x24:   114	0x28:  -103	0x2c:    62	0x30:   -35	0x34:     2	0x38:     0	0x3c:     0	
+0x40:     0	0x44:     0	0x48:     0	0x4c:     0	0x50:     0	0x54:     0	0x58:     0	0x5c:     0	
+0x60:     0	0x64:     0	0x68:     0	0x6c:     0	0x70:     0	0x74:     0	0x78:     0	0x7c:     0	
+0x80:     0	0x84:     0	0x88:     0	0x8c:     0	0x90:     0	0x94:     0	0x98:     0	0x9c:     0	
+0xa0:     0	0xa4:     0	0xa8:     0	0xac:     0	0xb0:     0	0xb4:     0	0xb8:     0	0xbc:     0	
+0xc0:     0	0xc4:     0	0xc8:     0	0xcc:     0	0xd0:     0	0xd4:     0	0xd8:     0	0xdc:     0	
+0xe0:     0	0xe4:     0	0xe8:     0	0xec:     0	0xf0:     0	0xf4:     0	0xf8:     0	0xfc:     0	
+=====================END MEM======================
+
+===================Cache Contents====================
+Set Index: 0
+	Tag: 0000000000000000000000000010	Valid: True	LRU: 9
+	[255, 255, 255, 93, 0, 0, 0, 114, 255, 255, 255, 153, 0, 0, 0, 62]
+	Tag: 0000000000000000000000000011	Valid: True	LRU: 25
+	[255, 255, 255, 221, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0]
+	Tag: 0000000000000000000000110010	Valid: True	LRU: 7
+	[255, 255, 255, 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	Tag: 0000000000000000000000110101	Valid: True	LRU: 12
+	[255, 255, 255, 221, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	Tag: 0000000000000000000000111000	Valid: True	LRU: 17
+	[255, 255, 255, 221, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	Tag: 0000000000000000000000111011	Valid: True	LRU: 22
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	Tag: 0000000000000000000000000100	Valid: True	LRU: 28
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	Tag: 0000000000000000000000111101	Valid: True	LRU: 29
+	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+=====================END CACHE======================
+

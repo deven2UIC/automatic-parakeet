@@ -4,7 +4,6 @@ import Memory
 
 class ISA:
     _regs = [0] * 32
-    # _mem = [0] * 32 * 8
     _mem_history = {}
     _regs_history = {}
 
@@ -17,7 +16,7 @@ class ISA:
 
     class ProgramState:
         regs = [0] * 32
-        mem = [0] * 32 * 8
+        mem = Memory.Memory()
 
         total = 0
         ALU = 0
@@ -104,6 +103,10 @@ class ISA:
 
         print("Program terminated successfully, printing end state...PC={}".format(self._PC))
         self.print_state()
+        print('Closing log file')
+        self._mem.print_mem_log()
+        self._mem.print_cache_log()
+        self._mem.close_log()
 
     def _step(self):
         """Runs the next instruction."""

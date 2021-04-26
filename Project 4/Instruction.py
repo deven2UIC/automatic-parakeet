@@ -230,13 +230,8 @@ def lw(core, inst):
 def sw(core, inst):
     core._memory = core._memory + 1
 
-    #print('$rs = {}'.format(core._regs[inst.get_rs()]))
-    #print('Offset: {}'.format(inst.get_imm()))
     mem_address = int((core._regs[inst.get_rs()] + inst.get_imm() - 0x2000) / 4)
-    print('Mem Address: {}'.format(mem_address))
     core.write_mem(mem_address, core._regs[inst.get_rt()])
-    #core.print_state()
-    #print()
 
 
 def lui(core, inst):
@@ -371,28 +366,8 @@ def mtc(core, inst):
     for i in range(len(operand1_str)):
         if operand1_str[i] == operand2_str[i]:
             count += 1
-
+    print(count)
     core._regs[inst.get_rd()] = count
-
-    '''
-    if (operand1 < 0):
-        operand1 = 1 - operand1
-
-    if (operand2 < 0):
-        operand2 = 1 - operand2
-
-    print('\n\n Op1: {}'.format(bin(operand1)))
-    print(' Op1: {}'.format(bin(operand2)))
-    print('xnor: {}'.format(bin( operand1 ^ operand2 )))
-    print(' res: {}\n\n'.format(bin( operand1 ^ operand2 )[2:].count('0')))
-
-    res_str = bin( operand1 ^ operand2 )[2:]
-
-    core.print_state()
-
-    core._regs[inst.get_rd()] = res_str.count('0') + (32 - len(res_str))
-    '''
-
 
 def j(core, inst):
     core._jump = core._jump + 1

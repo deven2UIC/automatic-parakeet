@@ -28,8 +28,8 @@ class Memory:
     }
 
     # Constants
-    ADDRESS_BITS = 16
-    DEBUG = True
+    ADDRESS_BITS = 32
+    DEBUG = False
 
     # Number of bits in each category
     _offset_bits = 0
@@ -38,9 +38,6 @@ class Memory:
 
     # actual memory array, init to 0
     _mem = [0] * 65536
-
-    # cache array
-    _cache = []
 
     def __init__(self, config=0):
         # Configure memory
@@ -59,159 +56,182 @@ class Memory:
                 self._tag_bits, self._set_bits, self._offset_bits))
 
         # Initialize stats to 0
-        _hit_count = 0
-        _miss_count = 0
-        _access_count = 0
+        self._hit_count = 0
+        self._miss_count = 0
+        self._access_count = 0
+
+        # cache array
+        self._cache = []
 
         # Each cache object is instantiated and added to cache
         for i in range(self._S):
             self._cache.append(CacheBlock(self._N, self._b))
 
+        self._output_file = open('log.txt', 'w')
+
+    def read(self, add):
+        """Reads value from mem/cache. Must be word aligned"""
+        valid, val = self._read_cache(add)
+        if not valid:
+            val = self._read_mem(add)
+            self._write_cache(add)
+            self._miss_count += 1  # CACHE MISS
+        else:
+            self._hit_count += 1  # CACHE HIT
+            pass
+
+        self._access_count += 1
+        self._output_file.write(
+            '\tAccess Count: {}\tHit Count: {}\tMiss Count: {}\n\n'.format(self._access_count, self._hit_count,
+                                                                         self._miss_count))
+        return val
+
+    def write(self, add, val):
+        """Writes value to mem/cache. Must be word aligned"""
+        self._write_mem(add, val)
+        valid = self._write_cache(add)
+        if valid:
+            self._hit_count += 1
+        else:
+            self._miss_count += 1
+
+        self._access_count += 1
+        self._output_file.write(
+            '\tAccess Count: {}\tHit Count: {}\tMiss Count: {}\n\n'.format(self._access_count, self._hit_count,
+                                                                         self._miss_count))
+
     def _read_cache(self, add):
         """Attempts cache read, returns boolean for result and a value"""
         # Retrive address components and convert to int
-        tag, set_index, offset = self.int_to_bin_string(add)
-        tag = int(tag, 2)
-        set_index = int(set_index, 2)
-        offset = int(offset, 2)
+        tag_bin, set_index_bin, offset_bin = self.int_to_bin_string(add)
+        tag = int(tag_bin, 2)
+        if self._set_bits == 0:
+            set_index = 0
+        else:
+            set_index = int(set_index_bin, 2)
+        offset = int(offset_bin, 2)
 
         if self.DEBUG:
-            print('READ CACHE: Tag: {}\tSet: {}\tOffset: {}'.format(tag, set_index, offset))
+            print('READ CACHE: Address: {}\tTag: {}\tSet: {}\tOffset: {}'.format(add, tag, set_index, offset))
 
         # Retrieve blocks corresponding to set index
         blocks = self._cache[set_index]
         # Ways are indexed by tag, so check if tag is in the ways dict
         if tag not in blocks.ways.keys():
-            # print('Tag not found, automatic miss and creation of new way')
             # Retrieve correct block from memory
             mem_block = self._mem[add: add + self._b]
 
             # Assign memory block to LRU way
-            blocks.set_LRU(tag, mem_block)
-            print('\tCACHE MISS')
+            replaced_tag = blocks.overwrite_LRU(tag, mem_block)
             return False, 0  # If tag is not present, automatic miss
 
         # print('Tag found checking if valid')
         valid, LRU, data = blocks.ways[tag]
 
         if valid:
-            # print('Valid tag')
-            blocks.update_LRU(tag)
-            print('\tCACHE HIT')
+            blocks.update_LRU(tag)  # Update LRU after hit
+            replaced_tag = tag
         else:
-            # print('Invalid tag')
             # Retrieve block from memory
             mem_block = self._mem[add: add + self._b]
 
             # Assign memory block to LRU way
-            blocks.set_LRU(tag, mem_block)
-            print('\tCACHE MISS')
+            replaced_tag = blocks.overwrite_LRU(tag, mem_block)
 
-        return valid, data[offset]  # Could still be miss, must check valid
+        val = self._list_to_int(data[offset: offset + 4])
 
-    def _write_cache(self, add, write_data):
+        if valid:
+            outcome = 'HIT'
+            self._output_file.write('CACHE READ\tADDRESS: {}\\{}\n'.format(bin(add), hex(add)))
+            self._output_file.write('\tOutcome: {}\n'.format(outcome))
+        else:
+            outcome = 'MISS'
+            self._output_file.write('CACHE READ\tADDRESS: {}\\{}\n'.format(bin(add), hex(add)))
+            self._output_file.write('\tOutcome: {}\tReplaced Tag: {}\n'.format(outcome, replaced_tag))
+
+        return valid, val  # Could still be miss, must check valid
+
+    def _write_cache(self, add):
         """Attempts cache write, returns True if successful"""
-        # Retrieve address components and convert to int
-        tag, set_index, offset = self.int_to_bin_string(add)
-        tag = int(tag, 2)
-        set_index = int(set_index, 2)
-        offset = int(offset, 2)
-
-        if self.DEBUG:
-            print('WRITE: Tag: {}\tSet: {}\tOffset: {}'.format(tag, set_index, offset))
+        # Retrive address components and convert to int
+        tag_bin, set_index_bin, offset_bin = self.int_to_bin_string(add)
+        tag = int(tag_bin, 2)
+        if self._set_bits == 0:
+            set_index = 0
+            set_index_bin = '0b0'
+        else:
+            set_index = int(set_index_bin, 2)
+        offset = int(offset_bin, 2)
 
         # Retrieve blocks corresponding to set index
         blocks = self._cache[set_index]
+        # Get new block from memory (just updated)
+        new_block = self._mem[add: add + self._b]
 
-        if tag in blocks.ways.keys():
-            # Retrieve entire block from cache
-            valid, LRU, block_data = blocks.ways[tag]
-
-            # If block is valid, write, else return false
-            if valid:
-                # print('Valid tag')
-                blocks.update_LRU(tag)
-                print('\tCACHE HIT')
-            else:
-                # print('Invalid tag')
-                # Retrieve block from memory
-                mem_block = self._mem[add: add + self._b]
-
-                # Assign memory block to LRU way
-                blocks.set_LRU(tag, mem_block)
-                print('\tCACHE MISS')
+        if tag not in blocks.ways.keys():
+            # Overwrite LRU block
+            replaced_tag = blocks.overwrite_LRU(tag, new_block)
+            success = False
         else:
-            # print('Invalid tag')
-            # Retrieve block from memory
-            mem_block = self._mem[add: add + self._b]
+            # Overwrite same outdate block
+            success = blocks.overwrite_block(tag, new_block)
+            replaced_tag = tag
 
-            # Assign memory block to LRU way
-            blocks.set_LRU(tag, mem_block)
-            print('\tCACHE MISS')
-
-    def read(self, add):
-        """Reads value from mem/cache. Must be word aligned"""
-        valid0, data0 = self._read_cache(add)
-        valid1, data1 = self._read_cache(add + 1)
-        valid2, data2 = self._read_cache(add + 2)
-        valid3, data3 = self._read_cache(add + 3)
-
-        val = 0
-        if valid0:
-            val += data0 << 24
-            val += data1 << 16
-            val += data2 << 8
-            val += data3
+        if success:
+            outcome = 'HIT'
+            self._output_file.write('CACHE READ\tADDRESS: {}\\{}\n'.format(bin(add), hex(add)))
+            self._output_file.write('\tOutcome: {}\n'.format(outcome))
         else:
-            val = self._read_mem(add)
+            outcome = 'MISS'
+            self._output_file.write('CACHE READ\tADDRESS: {}\\{}\n'.format(bin(add), hex(add)))
+            self._output_file.write('\tOutcome: {}\tReplaced Tag: {}\n'.format(outcome, replaced_tag))
 
-        return val
-
-    def write(self, add, val):
-        """Writes value to mem/cache. Must be word aligned"""
-        byte = [0] * 4
-        byte[0] = (val & 0xFF000000) >> 24
-        byte[1] = (val & 0x00FF0000) >> 16
-        byte[2] = (val & 0x0000FF00) >> 8
-        byte[3] = (val & 0x000000FF)
-
-        for i in range(4):
-            self._mem[add + i] = byte[i]
-
-        for i in range(4):
-            self.write_byte(add + i, byte[i])
+        return success
 
     def _read_mem(self, add):
-        val = 0
-        for i in range(4):
-            val += self._mem[add + i] << (24 - i * 8)
-        return val
+        """Reads 4 byte block from memory"""
+        val_list = self._mem[add: add + 4]
+        return self._list_to_int(val_list)
 
-    def _write_mem(self, add):
-        val = 0
-        for i in range(4):
-            val += self._mem[add + i] << (24 - i * 8)
-        return val
-
-    def read_byte(self, add):
-        """Reads byte value from memory with attempt at cache first"""
-        valid, data = self._read_cache(add)
-
-        if valid:
-            return data  # valid bit is set, cache hit
+    # Tested
+    def _write_mem(self, add, val):
+        """Writes 4 byte block to memory"""
+        if val < 0:
+            val = (val + 1) * -1
+            val_bin = bin(val)[2:].zfill(32)
+            val_new = ''
+            for i in range(len(val_bin)):
+                if val_bin[i] == '0':
+                    val_new += '1'
+                else:
+                    val_new += '0'
+            val_bin = val_new
         else:
-            return self._mem[add]  # valid is not set, cache miss w/ mem access
+            val_bin = bin(val)
+            val_bin = val_bin[2:].zfill(32)
 
-    def write_byte(self, add, val):
-        """Writes byte value to memory with attempt at cache first"""
-        self._write_cache(add, val)
-        self._mem[add] = val
+        for i in range(4):
+            self._mem[add + i] = int( val_bin[i * 8: (i * 8) + 8], 2 )
 
-    def read_mem_4byte(self, add):
-        val0 = bin(self._mem[add])[2:].zfill(4)
-        val1 = bin(self._mem[add + 1])[2:].zfill(4)
-        val2 = bin(self._mem[add + 2])[2:].zfill(4)
-        val3 = bin(self._mem[add + 3])[2:].zfill(4)
+    # Tested
+    def int_to_bin_string(self, add):
+        """Takes int memory address and cache address bin string (tag/set index/offset)"""
+        # Convert to binary string
+        add_bin = bin(add)[2:].zfill(self.ADDRESS_BITS)
+
+        # Split and assign to each category
+        tag = add_bin[:self._tag_bits]
+        set_index = add_bin[self._tag_bits: self._tag_bits + self._set_bits]
+        offset = add_bin[-1 * self._offset_bits:]
+        # print('Tag: {}\tSet Ind: {}\tOffset: {}'.format(tag, set_index, offset))
+        return tag, set_index, offset
+
+    # Tested
+    def _list_to_int(self, val):
+        val0 = bin(val[0])[2:].zfill(8)
+        val1 = bin(val[1])[2:].zfill(8)
+        val2 = bin(val[2])[2:].zfill(8)
+        val3 = bin(val[3])[2:].zfill(8)
         val = val0 + val1 + val2 + val3
 
         val_int = 0
@@ -226,46 +246,63 @@ class Memory:
 
         return val_int
 
-    def read_mem_block(self, add):
-        block = self._mem[add: add + self._b * 4]
-
-    # Tested
-    def int_to_bin_string(self, add):
-        """Takes int memory address and returns bin string"""
-        # Convert to binary string
-        add_bin = bin(add)[2:].zfill(self.ADDRESS_BITS)
-
-        # Split and assign to each category
-        tag = add_bin[:self._tag_bits]
-        set_index = add_bin[self._tag_bits: self._tag_bits + self._set_bits]
-        offset = add_bin[-1 * self._offset_bits:]
-        # print('Tag: {}\tSet Ind: {}\tOffset: {}'.format(tag, set_index, offset))
-        return tag, set_index, offset
-
     def print_cache(self):
         """Print formatted cache to screen"""
         print('===================Cache Contents====================')
+        self.print_stats()
         for i in range(len(self._cache)):
             print('Set Index: {}'.format(i))
             for way in self._cache[i].ways.items():
                 tag, (valid, LRU, data) = way
                 print('\tTag: {}\tValid: {}\tLRU: {}'.format(bin(tag)[2:].zfill(self._tag_bits), valid, LRU))
                 print('\t{}'.format(data))
-            print()
         print('=====================END CACHE======================\n')
+
+    def print_cache_log(self):
+        """Print formatted cache to screen"""
+        self._output_file.write('===================Cache Contents====================\n')
+        self.print_stats()
+        for i in range(len(self._cache)):
+            self._output_file.write('Set Index: {}\n'.format(i))
+            for way in self._cache[i].ways.items():
+                tag, (valid, LRU, data) = way
+                self._output_file.write('\tTag: {}\tValid: {}\tLRU: {}\n'.format(bin(tag)[2:].zfill(self._tag_bits), valid, LRU))
+                self._output_file.write('\t{}\n'.format(data))
+        self._output_file.write('=====================END CACHE======================\n\n')
 
     def print_mem(self):
         """Prints memory content."""
-        print('Memory:')
+        print('===================Mem Contents====================')
         mem_val = 0
         count = 0
         for i in range(0, 256, 4):
-            mem_val = self.read_mem_4byte(i)
+            mem_val = self._read_mem(i)
             print('0x{:>2}: {:>5}'.format(hex(i)[2:], mem_val), end='\t')
             count += 1
             if count == 8:
                 count = 0
                 print()
+        print('=====================END MEM======================\n')
+
+    def print_mem_log(self):
+        """Prints memory content."""
+        self._output_file.write('===================Mem Contents====================\n')
+        mem_val = 0
+        count = 0
+        for i in range(0, 256, 4):
+            mem_val = self._read_mem(i)
+            self._output_file.write('0x{:>2}: {:>5}\t'.format(hex(i)[2:], mem_val))
+            count += 1
+            if count == 8:
+                count = 0
+                self._output_file.write('\n')
+        self._output_file.write('=====================END MEM======================\n\n')
+
+    def print_stats(self):
+        print('Access Count: {}\tHit Count: {}\tMiss Count: {}'.format(self._access_count, self._hit_count, self._miss_count))
+
+    def close_log(self):
+        self._output_file.close()
 
 class CacheBlock:
     """Holds an entire data block w/ multiple ways"""
@@ -275,56 +312,76 @@ class CacheBlock:
             # tag : (valid, LRU, data)
         }
         for i in range(ways):
-            data = [0] * (size / 4)
+            data = [0] * size
             # (valid, LRU, data)
             self.ways[i] = (False, 0, data)
 
     def update_LRU(self, used_tag):
         """Update LRU priority bits after cache hit DO NOT USE WITH MISS"""
-        # Get list of LRU priorities
-        LRU_list = [way[1] for way in self.ways.values()]
+        if len(self.ways) > 1:
+            # Get list of LRU priorities
+            LRU_list = [way[1] for way in self.ways.values()]
 
-        # Get highest priority
-        max_LRU = max(LRU_list)
+            # Get highest priority
+            max_LRU = max(LRU_list)
 
-        # Set LRU priority to max + 1
-        (valid, LRU, data) = self.ways[used_tag]
-        LRU = max_LRU + 1
-        self.ways[used_tag] = (valid, LRU, data)
+            # Set LRU priority to max + 1
+            (valid, LRU, data) = self.ways[used_tag]
+            LRU = max_LRU + 1
+            self.ways[used_tag] = (valid, LRU, data)
 
-        # Decrement each priority so lowest is 0
-        # This will indicate the LRU block
-        min_LRU = min(LRU_list)
-        if min_LRU > 0:
-            for way in self.ways.values():
-                (valid, LRU, data) = way
-                LRU -= min_LRU
-                way = (valid, LRU, data)
+            # Decrement each priority so lowest is 0
+            # This will indicate the LRU block
+            min_LRU = min(LRU_list)
+            if min_LRU > 0:
+                for way in self.ways.items():
+                    tag, (valid, LRU, data) = way
+                    LRU -= min_LRU
+                    self.ways[tag] = (valid, LRU, data)
 
-    def set_LRU(self, new_tag, mem_block):
+    def overwrite_LRU(self, new_tag, mem_block):
         """Replace the LRU block, used after cache miss"""
-        LRU_list = [way[1] for way in self.ways.values()]
-        max_LRU = max(LRU_list)
+        replaced_tag = ''
+        if len(self.ways) > 1:
+            LRU_list = [way[1] for way in self.ways.values()]
+            max_LRU = max(LRU_list)
 
-        # Find way with lowest priority
-        for way in self.ways.items():
-            tag, (valid, LRU, data) = way
+            # Find way with lowest priority
+            for way in self.ways.items():
+                tag, (valid, LRU, data) = way
 
-            if LRU == 0:
-                # Delete LRU block
-                del self.ways[tag]
+                if LRU == 0:
+                    # Delete LRU block
+                    del self.ways[tag]
+                    replaced_tag = tag
+                    # Assign new block
+                    LRU = max_LRU + 1
 
-                # Assign new block
-                LRU = max_LRU + 1
+                    self.ways[new_tag] = (True, LRU, mem_block)
+                    break
 
-                self.ways[tag] = (True, LRU, mem_block)
-                break
+            # Decrement each priority so lowest is 0
+            # This will indicate the LRU block
+            min_LRU = min(LRU_list)
+            if min_LRU > 0:
+                for way in self.ways.items():
+                    tag, (valid, LRU, data) = way
+                    LRU -= min_LRU
+                    self.ways[tag] = (valid, LRU, data)
+        else:
+            self.ways[new_tag] = (True, 0, mem_block)
+            replaced_tag = new_tag
 
-        # Decrement each priority so lowest is 0
-        # This will indicate the LRU block
-        min_LRU = min(LRU_list)
-        if min_LRU > 0:
-            for way in self.ways.values():
-                (valid, LRU, data) = way
-                LRU -= min_LRU
-                way = (valid, LRU, data)
+        return replaced_tag
+
+    def overwrite_block(self, new_tag, mem_block):
+        """Overwrite block with existing tag"""
+        (valid, LRU, data) = self.ways[new_tag]
+        if len(self.ways) > 1:
+            LRU_list = [way[1] for way in self.ways.values()]
+            max_LRU = max(LRU_list)
+            self.ways[new_tag] = (True, max_LRU + 1, mem_block)
+        else:
+            self.ways[new_tag] = (True, 0, mem_block)
+        self.update_LRU(new_tag)
+        return valid
